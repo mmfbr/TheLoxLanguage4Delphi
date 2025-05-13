@@ -115,7 +115,6 @@
         <DCCReference Include="LoxLanguage.Interpreter.AST.pas"/>
         <DCCReference Include="LoxLanguage.Interpreter.Env.pas"/>
         <DCCReference Include="LoxLanguage.Interpreter.Resolver.pas"/>
-        <None Include="Win32\Debug\teste.sslang"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
@@ -168,6 +167,18 @@
                 <DeployFile LocalName="Win32\Debug\teste.sslang" Configuration="Debug" Class="ProjectFile">
                     <Platform Name="Win32">
                         <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="Win64\Debug\LoxLanguage.Interpreter.ConsoleApp.exe" Configuration="Debug" Class="ProjectOutput">
+                    <Platform Name="Win64">
+                        <RemoteName>LoxLanguage.Interpreter.ConsoleApp.exe</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="Win64\Debug\LoxLanguage.Interpreter.ConsoleApp.rsm" Configuration="Debug" Class="DebugSymbols">
+                    <Platform Name="Win64">
+                        <RemoteName>LoxLanguage.Interpreter.ConsoleApp.rsm</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
