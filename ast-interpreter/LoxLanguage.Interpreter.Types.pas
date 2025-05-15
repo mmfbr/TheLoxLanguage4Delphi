@@ -1,7 +1,9 @@
 // Marcello Mello
-// 28/09/2019
-
+// 13/05/2025
+//
 unit LoxLanguage.Interpreter.Types;
+
+{$SCOPEDENUMS ON}
 
 interface
 
@@ -9,8 +11,6 @@ uses
   SysUtils,
   Classes,
   Generics.Collections;
-
-{$SCOPEDENUMS ON}
 
 type
 
