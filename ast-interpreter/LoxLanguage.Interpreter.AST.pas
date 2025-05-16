@@ -5,7 +5,7 @@
 // ESSE ARQUIVO É GERADO DE FORMA AUTOMATICA PELO PROGRAMA "GenerateApp.exe"     
 //                                                                               
 // GenerateApp: LoxLanguage.Interpreter.AST.GenerateApp.exe
-// Data: 12/05/2025 19:31:43
+// Data: 15/05/2025 21:04:20
 //                                                                               
 // ******************************************************************************
 
@@ -22,7 +22,7 @@ type
   IVisitor = interface;
 
   TASTNode = class
-    function Accept(Visitor: IVisitor): TSSLangValue; virtual; abstract;
+    function Accept(Visitor: IVisitor): TLoxValue; virtual; abstract;
   end;
 
   { TExpression }
@@ -36,7 +36,7 @@ type
     FValue: TExpression;
   public
     constructor Create(Name: TToken; Value: TExpression);
-    function Accept(Visitor: IVisitor): TSSLangValue; override; 
+    function Accept(Visitor: IVisitor): TLoxValue; override; 
     property Name: TToken read FName write FName;
     property Value: TExpression read FValue write FValue;
   end;
@@ -48,7 +48,7 @@ type
     FRight: TExpression;
   public
     constructor Create(Left: TExpression; Operador: TToken; Right: TExpression);
-    function Accept(Visitor: IVisitor): TSSLangValue; override; 
+    function Accept(Visitor: IVisitor): TLoxValue; override; 
     property Left: TExpression read FLeft write FLeft;
     property Operador: TToken read FOperador write FOperador;
     property Right: TExpression read FRight write FRight;
@@ -61,7 +61,7 @@ type
     FArguments: TObjectList<TExpression>;
   public
     constructor Create(Callee: TExpression; Paren: TToken; Arguments: TObjectList<TExpression>);
-    function Accept(Visitor: IVisitor): TSSLangValue; override; 
+    function Accept(Visitor: IVisitor): TLoxValue; override; 
     property Callee: TExpression read FCallee write FCallee;
     property Paren: TToken read FParen write FParen;
     property Arguments: TObjectList<TExpression> read FArguments write FArguments;
@@ -73,7 +73,7 @@ type
     FName: TToken;
   public
     constructor Create(Obj: TExpression; Name: TToken);
-    function Accept(Visitor: IVisitor): TSSLangValue; override; 
+    function Accept(Visitor: IVisitor): TLoxValue; override; 
     property Obj: TExpression read FObj write FObj;
     property Name: TToken read FName write FName;
   end;
@@ -83,17 +83,17 @@ type
     FExpr: TExpression;
   public
     constructor Create(Expr: TExpression);
-    function Accept(Visitor: IVisitor): TSSLangValue; override; 
+    function Accept(Visitor: IVisitor): TLoxValue; override; 
     property Expr: TExpression read FExpr write FExpr;
   end;
 
   TLiteralExpression = class(TExpression)
   private
-    FValue: TSSLangValue;
+    FValue: TLoxValue;
   public
-    constructor Create(Value: TSSLangValue);
-    function Accept(Visitor: IVisitor): TSSLangValue; override; 
-    property Value: TSSLangValue read FValue write FValue;
+    constructor Create(Value: TLoxValue);
+    function Accept(Visitor: IVisitor): TLoxValue; override; 
+    property Value: TLoxValue read FValue write FValue;
   end;
 
   TLogicalExpression = class(TExpression)
@@ -103,7 +103,7 @@ type
     FRight: TExpression;
   public
     constructor Create(Left: TExpression; Operador: TToken; Right: TExpression);
-    function Accept(Visitor: IVisitor): TSSLangValue; override; 
+    function Accept(Visitor: IVisitor): TLoxValue; override; 
     property Left: TExpression read FLeft write FLeft;
     property Operador: TToken read FOperador write FOperador;
     property Right: TExpression read FRight write FRight;
@@ -116,7 +116,7 @@ type
     FValue: TExpression;
   public
     constructor Create(Obj: TExpression; Name: TToken; Value: TExpression);
-    function Accept(Visitor: IVisitor): TSSLangValue; override; 
+    function Accept(Visitor: IVisitor): TLoxValue; override; 
     property Obj: TExpression read FObj write FObj;
     property Name: TToken read FName write FName;
     property Value: TExpression read FValue write FValue;
@@ -128,7 +128,7 @@ type
     FMethod: TToken;
   public
     constructor Create(Keyword: TToken; Method: TToken);
-    function Accept(Visitor: IVisitor): TSSLangValue; override; 
+    function Accept(Visitor: IVisitor): TLoxValue; override; 
     property Keyword: TToken read FKeyword write FKeyword;
     property Method: TToken read FMethod write FMethod;
   end;
@@ -138,7 +138,7 @@ type
     FKeyword: TToken;
   public
     constructor Create(Keyword: TToken);
-    function Accept(Visitor: IVisitor): TSSLangValue; override; 
+    function Accept(Visitor: IVisitor): TLoxValue; override; 
     property Keyword: TToken read FKeyword write FKeyword;
   end;
 
@@ -148,7 +148,7 @@ type
     FRight: TExpression;
   public
     constructor Create(Operador: TToken; Right: TExpression);
-    function Accept(Visitor: IVisitor): TSSLangValue; override; 
+    function Accept(Visitor: IVisitor): TLoxValue; override; 
     property Operador: TToken read FOperador write FOperador;
     property Right: TExpression read FRight write FRight;
   end;
@@ -158,7 +158,7 @@ type
     FName: TToken;
   public
     constructor Create(Name: TToken);
-    function Accept(Visitor: IVisitor): TSSLangValue; override; 
+    function Accept(Visitor: IVisitor): TLoxValue; override; 
     property Name: TToken read FName write FName;
   end;
 
@@ -172,7 +172,7 @@ type
     FStatements: TObjectList<TStatement>;
   public
     constructor Create(Statements: TObjectList<TStatement>);
-    function Accept(Visitor: IVisitor): TSSLangValue; override; 
+    function Accept(Visitor: IVisitor): TLoxValue; override; 
     property Statements: TObjectList<TStatement> read FStatements write FStatements;
   end;
 
@@ -180,14 +180,14 @@ type
   private
   public
     constructor Create();
-    function Accept(Visitor: IVisitor): TSSLangValue; override; 
+    function Accept(Visitor: IVisitor): TLoxValue; override; 
   end;
 
   TContinueStatement = class(TStatement)
   private
   public
     constructor Create();
-    function Accept(Visitor: IVisitor): TSSLangValue; override; 
+    function Accept(Visitor: IVisitor): TLoxValue; override; 
   end;
 
   TExpressionStatement = class(TStatement)
@@ -195,7 +195,7 @@ type
     FExpression: TExpression;
   public
     constructor Create(Expression: TExpression);
-    function Accept(Visitor: IVisitor): TSSLangValue; override; 
+    function Accept(Visitor: IVisitor): TLoxValue; override; 
     property Expression: TExpression read FExpression write FExpression;
   end;
 
@@ -206,7 +206,7 @@ type
     FElseBranch: TStatement;
   public
     constructor Create(Condition: TExpression; ThenBranch: TStatement; ElseBranch: TStatement);
-    function Accept(Visitor: IVisitor): TSSLangValue; override; 
+    function Accept(Visitor: IVisitor): TLoxValue; override; 
     property Condition: TExpression read FCondition write FCondition;
     property ThenBranch: TStatement read FThenBranch write FThenBranch;
     property ElseBranch: TStatement read FElseBranch write FElseBranch;
@@ -219,7 +219,7 @@ type
     FBody: TObjectList<TStatement>;
   public
     constructor Create(Name: TToken; Params: TObjectList<TToken>; Body: TObjectList<TStatement>);
-    function Accept(Visitor: IVisitor): TSSLangValue; override; 
+    function Accept(Visitor: IVisitor): TLoxValue; override; 
     property Name: TToken read FName write FName;
     property Params: TObjectList<TToken> read FParams write FParams;
     property Body: TObjectList<TStatement> read FBody write FBody;
@@ -230,7 +230,7 @@ type
     FExpr: TExpression;
   public
     constructor Create(Expr: TExpression);
-    function Accept(Visitor: IVisitor): TSSLangValue; override; 
+    function Accept(Visitor: IVisitor): TLoxValue; override; 
     property Expr: TExpression read FExpr write FExpr;
   end;
 
@@ -241,7 +241,7 @@ type
     FMethods: TObjectList<TFunctionStatement>;
   public
     constructor Create(Name: TToken; SuperClass: TVariableExpression; Methods: TObjectList<TFunctionStatement>);
-    function Accept(Visitor: IVisitor): TSSLangValue; override; 
+    function Accept(Visitor: IVisitor): TLoxValue; override; 
     property Name: TToken read FName write FName;
     property SuperClass: TVariableExpression read FSuperClass write FSuperClass;
     property Methods: TObjectList<TFunctionStatement> read FMethods write FMethods;
@@ -253,7 +253,7 @@ type
     FValue: TExpression;
   public
     constructor Create(Keyword: TToken; Value: TExpression);
-    function Accept(Visitor: IVisitor): TSSLangValue; override; 
+    function Accept(Visitor: IVisitor): TLoxValue; override; 
     property Keyword: TToken read FKeyword write FKeyword;
     property Value: TExpression read FValue write FValue;
   end;
@@ -264,7 +264,7 @@ type
     FInitializer: TExpression;
   public
     constructor Create(Name: TToken; Initializer: TExpression);
-    function Accept(Visitor: IVisitor): TSSLangValue; override; 
+    function Accept(Visitor: IVisitor): TLoxValue; override; 
     property Name: TToken read FName write FName;
     property Initializer: TExpression read FInitializer write FInitializer;
   end;
@@ -275,36 +275,36 @@ type
     FBody: TStatement;
   public
     constructor Create(Condition: TExpression; Body: TStatement);
-    function Accept(Visitor: IVisitor): TSSLangValue; override; 
+    function Accept(Visitor: IVisitor): TLoxValue; override; 
     property Condition: TExpression read FCondition write FCondition;
     property Body: TStatement read FBody write FBody;
   end;
 
   IVisitor = interface
   ['{E92FFE0B-F01A-4F30-BF88-0C866382851F}']
-    function Visit(AssignExpression: TAssignExpression): TSSLangValue; overload;
-    function Visit(BinaryExpression: TBinaryExpression): TSSLangValue; overload;
-    function Visit(CallExpression: TCallExpression): TSSLangValue; overload;
-    function Visit(GetExpression: TGetExpression): TSSLangValue; overload;
-    function Visit(GroupingExpression: TGroupingExpression): TSSLangValue; overload;
-    function Visit(LiteralExpression: TLiteralExpression): TSSLangValue; overload;
-    function Visit(LogicalExpression: TLogicalExpression): TSSLangValue; overload;
-    function Visit(SetExpression: TSetExpression): TSSLangValue; overload;
-    function Visit(SuperExpression: TSuperExpression): TSSLangValue; overload;
-    function Visit(ThisExpression: TThisExpression): TSSLangValue; overload;
-    function Visit(UnaryExpression: TUnaryExpression): TSSLangValue; overload;
-    function Visit(VariableExpression: TVariableExpression): TSSLangValue; overload;
-    function Visit(BlockStatement: TBlockStatement): TSSLangValue; overload;
-    function Visit(BreakStatement: TBreakStatement): TSSLangValue; overload;
-    function Visit(ContinueStatement: TContinueStatement): TSSLangValue; overload;
-    function Visit(ExpressionStatement: TExpressionStatement): TSSLangValue; overload;
-    function Visit(IfStatement: TIfStatement): TSSLangValue; overload;
-    function Visit(FunctionStatement: TFunctionStatement): TSSLangValue; overload;
-    function Visit(PrintStatement: TPrintStatement): TSSLangValue; overload;
-    function Visit(ClassStatement: TClassStatement): TSSLangValue; overload;
-    function Visit(ReturnStatement: TReturnStatement): TSSLangValue; overload;
-    function Visit(VarStatement: TVarStatement): TSSLangValue; overload;
-    function Visit(WhileStatement: TWhileStatement): TSSLangValue; overload;
+    function Visit(AssignExpression: TAssignExpression): TLoxValue; overload;
+    function Visit(BinaryExpression: TBinaryExpression): TLoxValue; overload;
+    function Visit(CallExpression: TCallExpression): TLoxValue; overload;
+    function Visit(GetExpression: TGetExpression): TLoxValue; overload;
+    function Visit(GroupingExpression: TGroupingExpression): TLoxValue; overload;
+    function Visit(LiteralExpression: TLiteralExpression): TLoxValue; overload;
+    function Visit(LogicalExpression: TLogicalExpression): TLoxValue; overload;
+    function Visit(SetExpression: TSetExpression): TLoxValue; overload;
+    function Visit(SuperExpression: TSuperExpression): TLoxValue; overload;
+    function Visit(ThisExpression: TThisExpression): TLoxValue; overload;
+    function Visit(UnaryExpression: TUnaryExpression): TLoxValue; overload;
+    function Visit(VariableExpression: TVariableExpression): TLoxValue; overload;
+    function Visit(BlockStatement: TBlockStatement): TLoxValue; overload;
+    function Visit(BreakStatement: TBreakStatement): TLoxValue; overload;
+    function Visit(ContinueStatement: TContinueStatement): TLoxValue; overload;
+    function Visit(ExpressionStatement: TExpressionStatement): TLoxValue; overload;
+    function Visit(IfStatement: TIfStatement): TLoxValue; overload;
+    function Visit(FunctionStatement: TFunctionStatement): TLoxValue; overload;
+    function Visit(PrintStatement: TPrintStatement): TLoxValue; overload;
+    function Visit(ClassStatement: TClassStatement): TLoxValue; overload;
+    function Visit(ReturnStatement: TReturnStatement): TLoxValue; overload;
+    function Visit(VarStatement: TVarStatement): TLoxValue; overload;
+    function Visit(WhileStatement: TWhileStatement): TLoxValue; overload;
   end;
 
 implementation
@@ -317,7 +317,7 @@ begin
   FValue := Value;
 end;
 
-function TAssignExpression.Accept(Visitor: IVisitor): TSSLangValue; 
+function TAssignExpression.Accept(Visitor: IVisitor): TLoxValue; 
 begin
   Result := Visitor.Visit(Self);
 end;
@@ -329,7 +329,7 @@ begin
   FRight := Right;
 end;
 
-function TBinaryExpression.Accept(Visitor: IVisitor): TSSLangValue; 
+function TBinaryExpression.Accept(Visitor: IVisitor): TLoxValue; 
 begin
   Result := Visitor.Visit(Self);
 end;
@@ -341,7 +341,7 @@ begin
   FArguments := Arguments;
 end;
 
-function TCallExpression.Accept(Visitor: IVisitor): TSSLangValue; 
+function TCallExpression.Accept(Visitor: IVisitor): TLoxValue; 
 begin
   Result := Visitor.Visit(Self);
 end;
@@ -352,7 +352,7 @@ begin
   FName := Name;
 end;
 
-function TGetExpression.Accept(Visitor: IVisitor): TSSLangValue; 
+function TGetExpression.Accept(Visitor: IVisitor): TLoxValue; 
 begin
   Result := Visitor.Visit(Self);
 end;
@@ -362,17 +362,17 @@ begin
   FExpr := Expr;
 end;
 
-function TGroupingExpression.Accept(Visitor: IVisitor): TSSLangValue; 
+function TGroupingExpression.Accept(Visitor: IVisitor): TLoxValue; 
 begin
   Result := Visitor.Visit(Self);
 end;
 
-constructor TLiteralExpression.Create(Value: TSSLangValue);
+constructor TLiteralExpression.Create(Value: TLoxValue);
 begin
   FValue := Value;
 end;
 
-function TLiteralExpression.Accept(Visitor: IVisitor): TSSLangValue; 
+function TLiteralExpression.Accept(Visitor: IVisitor): TLoxValue; 
 begin
   Result := Visitor.Visit(Self);
 end;
@@ -384,7 +384,7 @@ begin
   FRight := Right;
 end;
 
-function TLogicalExpression.Accept(Visitor: IVisitor): TSSLangValue; 
+function TLogicalExpression.Accept(Visitor: IVisitor): TLoxValue; 
 begin
   Result := Visitor.Visit(Self);
 end;
@@ -396,7 +396,7 @@ begin
   FValue := Value;
 end;
 
-function TSetExpression.Accept(Visitor: IVisitor): TSSLangValue; 
+function TSetExpression.Accept(Visitor: IVisitor): TLoxValue; 
 begin
   Result := Visitor.Visit(Self);
 end;
@@ -407,7 +407,7 @@ begin
   FMethod := Method;
 end;
 
-function TSuperExpression.Accept(Visitor: IVisitor): TSSLangValue; 
+function TSuperExpression.Accept(Visitor: IVisitor): TLoxValue; 
 begin
   Result := Visitor.Visit(Self);
 end;
@@ -417,7 +417,7 @@ begin
   FKeyword := Keyword;
 end;
 
-function TThisExpression.Accept(Visitor: IVisitor): TSSLangValue; 
+function TThisExpression.Accept(Visitor: IVisitor): TLoxValue; 
 begin
   Result := Visitor.Visit(Self);
 end;
@@ -428,7 +428,7 @@ begin
   FRight := Right;
 end;
 
-function TUnaryExpression.Accept(Visitor: IVisitor): TSSLangValue; 
+function TUnaryExpression.Accept(Visitor: IVisitor): TLoxValue; 
 begin
   Result := Visitor.Visit(Self);
 end;
@@ -438,7 +438,7 @@ begin
   FName := Name;
 end;
 
-function TVariableExpression.Accept(Visitor: IVisitor): TSSLangValue; 
+function TVariableExpression.Accept(Visitor: IVisitor): TLoxValue; 
 begin
   Result := Visitor.Visit(Self);
 end;
@@ -450,7 +450,7 @@ begin
   FStatements := Statements;
 end;
 
-function TBlockStatement.Accept(Visitor: IVisitor): TSSLangValue; 
+function TBlockStatement.Accept(Visitor: IVisitor): TLoxValue; 
 begin
   Result := Visitor.Visit(Self);
 end;
@@ -459,7 +459,7 @@ constructor TBreakStatement.Create();
 begin
 end;
 
-function TBreakStatement.Accept(Visitor: IVisitor): TSSLangValue; 
+function TBreakStatement.Accept(Visitor: IVisitor): TLoxValue; 
 begin
   Result := Visitor.Visit(Self);
 end;
@@ -468,7 +468,7 @@ constructor TContinueStatement.Create();
 begin
 end;
 
-function TContinueStatement.Accept(Visitor: IVisitor): TSSLangValue; 
+function TContinueStatement.Accept(Visitor: IVisitor): TLoxValue; 
 begin
   Result := Visitor.Visit(Self);
 end;
@@ -478,7 +478,7 @@ begin
   FExpression := Expression;
 end;
 
-function TExpressionStatement.Accept(Visitor: IVisitor): TSSLangValue; 
+function TExpressionStatement.Accept(Visitor: IVisitor): TLoxValue; 
 begin
   Result := Visitor.Visit(Self);
 end;
@@ -490,7 +490,7 @@ begin
   FElseBranch := ElseBranch;
 end;
 
-function TIfStatement.Accept(Visitor: IVisitor): TSSLangValue; 
+function TIfStatement.Accept(Visitor: IVisitor): TLoxValue; 
 begin
   Result := Visitor.Visit(Self);
 end;
@@ -502,7 +502,7 @@ begin
   FBody := Body;
 end;
 
-function TFunctionStatement.Accept(Visitor: IVisitor): TSSLangValue; 
+function TFunctionStatement.Accept(Visitor: IVisitor): TLoxValue; 
 begin
   Result := Visitor.Visit(Self);
 end;
@@ -512,7 +512,7 @@ begin
   FExpr := Expr;
 end;
 
-function TPrintStatement.Accept(Visitor: IVisitor): TSSLangValue; 
+function TPrintStatement.Accept(Visitor: IVisitor): TLoxValue; 
 begin
   Result := Visitor.Visit(Self);
 end;
@@ -524,7 +524,7 @@ begin
   FMethods := Methods;
 end;
 
-function TClassStatement.Accept(Visitor: IVisitor): TSSLangValue; 
+function TClassStatement.Accept(Visitor: IVisitor): TLoxValue; 
 begin
   Result := Visitor.Visit(Self);
 end;
@@ -535,7 +535,7 @@ begin
   FValue := Value;
 end;
 
-function TReturnStatement.Accept(Visitor: IVisitor): TSSLangValue; 
+function TReturnStatement.Accept(Visitor: IVisitor): TLoxValue; 
 begin
   Result := Visitor.Visit(Self);
 end;
@@ -546,7 +546,7 @@ begin
   FInitializer := Initializer;
 end;
 
-function TVarStatement.Accept(Visitor: IVisitor): TSSLangValue; 
+function TVarStatement.Accept(Visitor: IVisitor): TLoxValue; 
 begin
   Result := Visitor.Visit(Self);
 end;
@@ -557,7 +557,7 @@ begin
   FBody := Body;
 end;
 
-function TWhileStatement.Accept(Visitor: IVisitor): TSSLangValue; 
+function TWhileStatement.Accept(Visitor: IVisitor): TLoxValue; 
 begin
   Result := Visitor.Visit(Self);
 end;

@@ -15,7 +15,7 @@ uses
 
 type
 
-  TSSLangRunner = class
+  TLoxRunner = class
   private
     FHadError: Boolean;
     procedure Error(LineNro: Integer; Msg: string);
@@ -38,28 +38,28 @@ uses
   LoxLanguage.Interpreter,
   LoxLanguage.Interpreter.Resolver;
 
-procedure TSSLangRunner.Report(LineNro: Integer; Where: string; Msg: string);
+procedure TLoxRunner.Report(LineNro: Integer; Where: string; Msg: string);
 begin
   Writeln(Format('[Linha %d] Erro %s : %s', [LineNro, Where, Msg]));
   FHadError := True;
 end;
 
-constructor TSSLangRunner.Create;
+constructor TLoxRunner.Create;
 begin
 
 end;
 
-procedure TSSLangRunner.Error(LineNro: Integer; Msg: string);
+procedure TLoxRunner.Error(LineNro: Integer; Msg: string);
 begin
   Report(LineNro, '', Msg);
 end;
 
-procedure TSSLangRunner.ParserError(Token: TToken; Msg: string);
+procedure TLoxRunner.ParserError(Token: TToken; Msg: string);
 begin
   Report(Token.LineNro, '', Msg);
 end;
 
-procedure TSSLangRunner.Run(source: string);
+procedure TLoxRunner.Run(source: string);
 var
   Scanner: TScanner;
   Tokens: TObjectList<TToken>;
@@ -91,7 +91,7 @@ begin
   TInterpreter(Interpreter).Interpret(Statements);
 end;
 
-procedure TSSLangRunner.RunFile(Path: string);
+procedure TLoxRunner.RunFile(Path: string);
 begin
   Run(TFile.ReadAllText(Path));
 
@@ -100,7 +100,7 @@ begin
 end;
 
 
-procedure TSSLangRunner.RunScript(Script: string);
+procedure TLoxRunner.RunScript(Script: string);
 begin
   Run(Script);
 end;

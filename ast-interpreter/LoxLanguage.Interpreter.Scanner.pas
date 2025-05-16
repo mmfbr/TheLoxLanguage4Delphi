@@ -30,7 +30,7 @@ type
     function Advance: Char;
     procedure ScanToken;
     procedure AddToken(TokenType: TTokenType); overload;
-    procedure AddToken(TokenType: TTokenType; Literal: TSSLangValue); overload;
+    procedure AddToken(TokenType: TTokenType; Literal: TLoxValue); overload;
     procedure Error(Line: Integer; Msg: string);
     function Match(Expected: Char): Boolean;
     function Peek: Char;
@@ -83,14 +83,14 @@ end;
 
 procedure TScanner.AddToken(TokenType: TTokenType);
 var
-  NullValue: TSSLangValue;
+  NullValue: TLoxValue;
 begin
-  NullValue := Default(TSSLangValue);
-  NullValue.ValueType := TSSLangValueType.IS_NULL;
+  NullValue := Default(TLoxValue);
+  NullValue.ValueType := TLoxValueType.IS_NULL;
   AddToken(TokenType, NullValue);
 end;
 
-procedure TScanner.AddToken(TokenType: TTokenType; Literal: TSSLangValue);
+procedure TScanner.AddToken(TokenType: TTokenType; Literal: TLoxValue);
 var
   Text: string;
 begin
@@ -178,7 +178,7 @@ end;
 
 procedure TScanner.ScanNumber;
 var
-  Value: TSSLangValue;
+  Value: TLoxValue;
   OldDecimalSeparator: Char;
 begin
   while IsDigit(Peek()) do
@@ -197,8 +197,8 @@ begin
   OldDecimalSeparator := FormatSettings.DecimalSeparator;
   try
     FormatSettings.DecimalSeparator := '.';
-    Value := Default(TSSLangValue);
-    Value.ValueType := TSSLangValueType.IS_DOUBLE;
+    Value := Default(TLoxValue);
+    Value.ValueType := TLoxValueType.IS_DOUBLE;
     Value.DoubleValue := StrToFloat(Copy(FSource, FStart, FCurrent - FStart));
     AddToken(TTokenType.NUMBER, Value);
   finally
@@ -208,7 +208,7 @@ end;
 
 procedure TScanner.ScanString();
 var
-  Value: TSSLangValue;
+  Value: TLoxValue;
 begin
 
   while (Peek() <> '"') and not IsAtEnd() do
@@ -230,8 +230,8 @@ begin
   Advance();
 
   // Apare as aspas circundantes.
-  Value := Default(TSSLangValue);
-  Value.ValueType := TSSLangValueType.IS_STRING;
+  Value := Default(TLoxValue);
+  Value.ValueType := TLoxValueType.IS_STRING;
   Value.StrValue := ShortString(Copy(FSource, FStart + 1, FCurrent - FStart - 2));
   AddToken(TTokenType.&STRING, Value);
 end;
@@ -273,7 +273,7 @@ end;
 
 function TScanner.ScanTokens: TObjectList<TToken>;
 var
-  NullValue: TSSLangValue;
+  NullValue: TLoxValue;
 begin
 
   while not IsAtEnd() do
@@ -283,7 +283,7 @@ begin
     ScanToken();
   end;
 
-  NullValue.ValueType := TSSLangValueType.IS_NULL;
+  NullValue.ValueType := TLoxValueType.IS_NULL;
   FTokens.Add(TToken.Create(TTokenType.EOF, '', NullValue, FLineNro));
   Result := FTokens;
 

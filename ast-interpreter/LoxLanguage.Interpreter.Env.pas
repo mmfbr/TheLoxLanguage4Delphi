@@ -15,17 +15,17 @@ type
 
   TEnvironment = class
   private
-    FValues: TDictionary<string, TSSLangValue>;
+    FValues: TDictionary<string, TLoxValue>;
     FEnclosing: TEnvironment;
   public
     constructor Create(Enclosing: TEnvironment = nil);
     destructor Destroy; override;
-    procedure Define(const Name: string; Value: TSSLangValue);
+    procedure Define(const Name: string; Value: TLoxValue);
     function Ancestor(Distance: Integer): TEnvironment;
-    function GetAt(Distance: Integer; Name: string): TSSLangValue;
-    procedure AssignAt(Distance: Integer; Name: TToken; Value: TSSLangValue);
-    function Get(Name: TToken): TSSLangValue;
-    procedure Assign(Name: TToken; Value: TSSLangValue);
+    function GetAt(Distance: Integer; Name: string): TLoxValue;
+    procedure AssignAt(Distance: Integer; Name: TToken; Value: TLoxValue);
+    function Get(Name: TToken): TLoxValue;
+    procedure Assign(Name: TToken; Value: TLoxValue);
     property Enclosing: TEnvironment read FEnclosing;
   end;
 
@@ -42,10 +42,10 @@ end;
 constructor TEnvironment.Create(Enclosing: TEnvironment = nil);
 begin
   FEnclosing := Enclosing;
-  FValues := TDictionary<string, TSSLangValue>.Create();
+  FValues := TDictionary<string, TLoxValue>.Create();
 end;
 
-procedure TEnvironment.Define(const Name: string; Value: TSSLangValue);
+procedure TEnvironment.Define(const Name: string; Value: TLoxValue);
 begin
   FValues.AddOrSetValue(Name, Value);
 end;
@@ -63,17 +63,17 @@ begin
   Result := Environment;
 end;
 
-function TEnvironment.GetAt(Distance: Integer; Name: string): TSSLangValue;
+function TEnvironment.GetAt(Distance: Integer; Name: string): TLoxValue;
 begin
   Result := Ancestor(distance).FValues[Name];
 end;
 
-procedure TEnvironment.AssignAt(Distance: Integer; Name: TToken; Value: TSSLangValue);
+procedure TEnvironment.AssignAt(Distance: Integer; Name: TToken; Value: TLoxValue);
 begin
   Ancestor(distance).FValues[Name.lexeme] := Value;
 end;
 
-function TEnvironment.Get(Name: TToken): TSSLangValue;
+function TEnvironment.Get(Name: TToken): TLoxValue;
 begin
 
   if FValues.ContainsKey(Name.Lexeme) then
@@ -85,7 +85,7 @@ begin
 
 end;
 
-procedure TEnvironment.Assign(Name: TToken; Value: TSSLangValue);
+procedure TEnvironment.Assign(Name: TToken; Value: TLoxValue);
 begin
 
   if (FValues.ContainsKey(Name.Lexeme)) then

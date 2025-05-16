@@ -19,29 +19,29 @@ type
     function Parenthesize2(Name: string; Parts: array of const): ShortString;
     procedure Transform(Builder: TStringBuilder; Parts: array of const);
   public
-    function Visit(AssignExpression: TAssignExpression): TSSLangValue; overload;
-    function Visit(BinaryExpression: TBinaryExpression): TSSLangValue; overload;
-    function Visit(CallExpression: TCallExpression): TSSLangValue; overload;
-    function Visit(GetExpression: TGetExpression): TSSLangValue; overload;
-    function Visit(GroupingExpression: TGroupingExpression): TSSLangValue; overload;
-    function Visit(LiteralExpression: TLiteralExpression): TSSLangValue; overload;
-    function Visit(LogicalExpression: TLogicalExpression): TSSLangValue; overload;
-    function Visit(SetExpression: TSetExpression): TSSLangValue; overload;
-    function Visit(SuperExpression: TSuperExpression): TSSLangValue; overload;
-    function Visit(ThisExpression: TThisExpression): TSSLangValue; overload;
-    function Visit(UnaryExpression: TUnaryExpression): TSSLangValue; overload;
-    function Visit(VariableExpression: TVariableExpression): TSSLangValue; overload;
-    function Visit(BlockStatement: TBlockStatement): TSSLangValue; overload;
-    function Visit(BreakStatement: TBreakStatement): TSSLangValue; overload;
-    function Visit(ContinueStatement: TContinueStatement): TSSLangValue; overload;
-    function Visit(ExpressionStatement: TExpressionStatement): TSSLangValue; overload;
-    function Visit(IfStatement: TIfStatement): TSSLangValue; overload;
-    function Visit(FunctionStatement: TFunctionStatement): TSSLangValue; overload;
-    function Visit(PrintStatement: TPrintStatement): TSSLangValue; overload;
-    function Visit(ClassStatement: TClassStatement): TSSLangValue; overload;
-    function Visit(ReturnStatement: TReturnStatement): TSSLangValue; overload;
-    function Visit(VarStatement: TVarStatement): TSSLangValue; overload;
-    function Visit(WhileStatement: TWhileStatement): TSSLangValue; overload;
+    function Visit(AssignExpression: TAssignExpression): TLoxValue; overload;
+    function Visit(BinaryExpression: TBinaryExpression): TLoxValue; overload;
+    function Visit(CallExpression: TCallExpression): TLoxValue; overload;
+    function Visit(GetExpression: TGetExpression): TLoxValue; overload;
+    function Visit(GroupingExpression: TGroupingExpression): TLoxValue; overload;
+    function Visit(LiteralExpression: TLiteralExpression): TLoxValue; overload;
+    function Visit(LogicalExpression: TLogicalExpression): TLoxValue; overload;
+    function Visit(SetExpression: TSetExpression): TLoxValue; overload;
+    function Visit(SuperExpression: TSuperExpression): TLoxValue; overload;
+    function Visit(ThisExpression: TThisExpression): TLoxValue; overload;
+    function Visit(UnaryExpression: TUnaryExpression): TLoxValue; overload;
+    function Visit(VariableExpression: TVariableExpression): TLoxValue; overload;
+    function Visit(BlockStatement: TBlockStatement): TLoxValue; overload;
+    function Visit(BreakStatement: TBreakStatement): TLoxValue; overload;
+    function Visit(ContinueStatement: TContinueStatement): TLoxValue; overload;
+    function Visit(ExpressionStatement: TExpressionStatement): TLoxValue; overload;
+    function Visit(IfStatement: TIfStatement): TLoxValue; overload;
+    function Visit(FunctionStatement: TFunctionStatement): TLoxValue; overload;
+    function Visit(PrintStatement: TPrintStatement): TLoxValue; overload;
+    function Visit(ClassStatement: TClassStatement): TLoxValue; overload;
+    function Visit(ReturnStatement: TReturnStatement): TLoxValue; overload;
+    function Visit(VarStatement: TVarStatement): TLoxValue; overload;
+    function Visit(WhileStatement: TWhileStatement): TLoxValue; overload;
     function Print(Stmt: TStatement): ShortString; overload;
     function Print(Expr: TASTNode): ShortString; overload;
   end;
@@ -53,35 +53,35 @@ uses
 
 { TAstPrinter }
 
-function TAstPrinter.Visit(BinaryExpression: TBinaryExpression): TSSLangValue;
+function TAstPrinter.Visit(BinaryExpression: TBinaryExpression): TLoxValue;
 begin
-  Result.ValueType := TSSLangValueType.IS_STRING;
+  Result.ValueType := TLoxValueType.IS_STRING;
   Result.StrValue := Parenthesize(BinaryExpression.Operador.Lexeme, [BinaryExpression.Left, BinaryExpression.Right]);
 end;
 
 function TAstPrinter.Visit(GroupingExpression: TGroupingExpression)
-  : TSSLangValue;
+  : TLoxValue;
 begin
-  Result.ValueType := TSSLangValueType.IS_STRING;
+  Result.ValueType := TLoxValueType.IS_STRING;
   Result.StrValue := Parenthesize('group', [GroupingExpression.Expr]);
 end;
 
-function TAstPrinter.Visit(LiteralExpression: TLiteralExpression): TSSLangValue;
+function TAstPrinter.Visit(LiteralExpression: TLiteralExpression): TLoxValue;
 begin
-  Result.ValueType := TSSLangValueType.IS_STRING;
+  Result.ValueType := TLoxValueType.IS_STRING;
 
- if (LiteralExpression.value.ValueType = TSSLangValueType.IS_OBJECT) and
+ if (LiteralExpression.value.ValueType = TLoxValueType.IS_OBJECT) and
     (LiteralExpression.value.ObjectInstanceValue = nil) then
    Result.StrValue := 'nil'
  else
  begin
-   if LiteralExpression.value.ValueType = TSSLangValueType.IS_STRING then
+   if LiteralExpression.value.ValueType = TLoxValueType.IS_STRING then
      Result.StrValue := LiteralExpression.Value.StrValue
-   else if LiteralExpression.value.ValueType = TSSLangValueType.IS_INT32 then
+   else if LiteralExpression.value.ValueType = TLoxValueType.IS_INT32 then
      Result.StrValue := UTF8Encode(IntToStr(LiteralExpression.Value.Int32Value))
-   else if LiteralExpression.value.ValueType = TSSLangValueType.IS_INT64 then
+   else if LiteralExpression.value.ValueType = TLoxValueType.IS_INT64 then
      Result.StrValue := UTF8Encode(IntToStr(LiteralExpression.Value.Int64Value))
-   else if LiteralExpression.value.ValueType = TSSLangValueType.IS_DOUBLE then
+   else if LiteralExpression.value.ValueType = TLoxValueType.IS_DOUBLE then
      Result.StrValue := UTF8Encode(FloatToStr(LiteralExpression.Value.DoubleValue))
    else
      Result.StrValue := 'undef';
@@ -89,36 +89,36 @@ begin
 
 end;
 
-function TAstPrinter.Visit(UnaryExpression: TUnaryExpression): TSSLangValue;
+function TAstPrinter.Visit(UnaryExpression: TUnaryExpression): TLoxValue;
 begin
-  Result.ValueType := TSSLangValueType.IS_STRING;
+  Result.ValueType := TLoxValueType.IS_STRING;
   Result.StrValue :=  Parenthesize(UnaryExpression.Operador.Lexeme, [UnaryExpression.Right]);
 end;
 
-function TAstPrinter.Visit(SuperExpression: TSuperExpression): TSSLangValue;
+function TAstPrinter.Visit(SuperExpression: TSuperExpression): TLoxValue;
 begin
-  Result.ValueType := TSSLangValueType.IS_STRING;
+  Result.ValueType := TLoxValueType.IS_STRING;
   Result.StrValue := Parenthesize2('super', [SuperExpression.Method]);
 end;
 
-function TAstPrinter.Visit(ThisExpression: TThisExpression): TSSLangValue;
+function TAstPrinter.Visit(ThisExpression: TThisExpression): TLoxValue;
 begin
-  Result.ValueType := TSSLangValueType.IS_STRING;
+  Result.ValueType := TLoxValueType.IS_STRING;
   Result.StrValue := 'this';
 end;
 
 function TAstPrinter.Visit(VariableExpression: TVariableExpression)
-  : TSSLangValue;
+  : TLoxValue;
 begin
-  Result.ValueType := TSSLangValueType.IS_STRING;
+  Result.ValueType := TLoxValueType.IS_STRING;
   Result.StrValue := UTF8Encode(VariableExpression.Name.Lexeme);
 end;
 
-function TAstPrinter.Visit(BlockStatement: TBlockStatement): TSSLangValue;
+function TAstPrinter.Visit(BlockStatement: TBlockStatement): TLoxValue;
 var
   Statement: TStatement;
 begin
-  Result.ValueType := TSSLangValueType.IS_STRING;
+  Result.ValueType := TLoxValueType.IS_STRING;
 
   Result.StrValue := '(block ';
 
@@ -128,49 +128,49 @@ begin
   Result.StrValue := Result.StrValue + ')';
 end;
 
-function TAstPrinter.Visit(SetExpression: TSetExpression): TSSLangValue;
+function TAstPrinter.Visit(SetExpression: TSetExpression): TLoxValue;
 begin
-  Result.ValueType := TSSLangValueType.IS_STRING;
+  Result.ValueType := TLoxValueType.IS_STRING;
   Result.StrValue := Parenthesize2('=',
         [SetExpression.Obj, SetExpression.Name.Lexeme, SetExpression.Value]);
 end;
 
-function TAstPrinter.Visit(AssignExpression: TAssignExpression): TSSLangValue;
+function TAstPrinter.Visit(AssignExpression: TAssignExpression): TLoxValue;
 begin
-  Result.ValueType := TSSLangValueType.IS_STRING;
+  Result.ValueType := TLoxValueType.IS_STRING;
   Result.StrValue := Parenthesize2('=', [AssignExpression.Name.Lexeme,
     AssignExpression.Value]);
 end;
 
-function TAstPrinter.Visit(CallExpression: TCallExpression): TSSLangValue;
+function TAstPrinter.Visit(CallExpression: TCallExpression): TLoxValue;
 begin
-  Result.ValueType := TSSLangValueType.IS_STRING;
+  Result.ValueType := TLoxValueType.IS_STRING;
   Result.StrValue :=Parenthesize2('call', [CallExpression.Callee, CallExpression.Arguments]);
 end;
 
-function TAstPrinter.Visit(GetExpression: TGetExpression): TSSLangValue;
+function TAstPrinter.Visit(GetExpression: TGetExpression): TLoxValue;
 begin
-  Result.ValueType := TSSLangValueType.IS_STRING;
+  Result.ValueType := TLoxValueType.IS_STRING;
   Result.StrValue := Parenthesize2('.', [GetExpression.Obj, GetExpression.Name.Lexeme]);
 end;
 
-function TAstPrinter.Visit(LogicalExpression: TLogicalExpression): TSSLangValue;
+function TAstPrinter.Visit(LogicalExpression: TLogicalExpression): TLoxValue;
 begin
-  Result.ValueType := TSSLangValueType.IS_STRING;
+  Result.ValueType := TLoxValueType.IS_STRING;
   Result.StrValue := Parenthesize(LogicalExpression.Operador.Lexeme, [LogicalExpression.left, LogicalExpression.right]);
 end;
 
-function TAstPrinter.Visit(BreakStatement: TBreakStatement): TSSLangValue;
+function TAstPrinter.Visit(BreakStatement: TBreakStatement): TLoxValue;
 begin
-  Result.ValueType := TSSLangValueType.IS_STRING;
+  Result.ValueType := TLoxValueType.IS_STRING;
   Result.StrValue := 'break';
 end;
 
-function TAstPrinter.Visit(ClassStatement: TClassStatement): TSSLangValue;
+function TAstPrinter.Visit(ClassStatement: TClassStatement): TLoxValue;
 var
   Method: TFunctionStatement;
 begin
-  Result.ValueType := TSSLangValueType.IS_STRING;
+  Result.ValueType := TLoxValueType.IS_STRING;
   Result.StrValue := UTF8Encode('(class ' + ClassStatement.Name.Lexeme);
   // > Inheritance omit
 
@@ -184,9 +184,9 @@ begin
   Result.StrValue := Result.StrValue + ')';
 end;
 
-function TAstPrinter.Visit(ReturnStatement: TReturnStatement): TSSLangValue;
+function TAstPrinter.Visit(ReturnStatement: TReturnStatement): TLoxValue;
 begin
-  Result.ValueType := TSSLangValueType.IS_STRING;
+  Result.ValueType := TLoxValueType.IS_STRING;
 
   if (ReturnStatement.Value = nil) then
   begin
@@ -197,9 +197,9 @@ begin
   Result.StrValue := Parenthesize('return', [ReturnStatement.Value]);
 end;
 
-function TAstPrinter.Visit(VarStatement: TVarStatement): TSSLangValue;
+function TAstPrinter.Visit(VarStatement: TVarStatement): TLoxValue;
 begin
-  Result.ValueType := TSSLangValueType.IS_STRING;
+  Result.ValueType := TLoxValueType.IS_STRING;
 
   if (VarStatement.Initializer = nil) then
     Result.StrValue := Parenthesize2('var', [VarStatement.Name])
@@ -234,35 +234,35 @@ begin
   Result := Expr.Accept(Self).StrValue;
 end;
 
-function TAstPrinter.Visit(WhileStatement: TWhileStatement): TSSLangValue;
+function TAstPrinter.Visit(WhileStatement: TWhileStatement): TLoxValue;
 begin
-  Result.ValueType := TSSLangValueType.IS_STRING;
+  Result.ValueType := TLoxValueType.IS_STRING;
   Result.StrValue := Parenthesize2('while', [WhileStatement.Condition,
     WhileStatement.Body]);
 end;
 
-function TAstPrinter.Visit(PrintStatement: TPrintStatement): TSSLangValue;
+function TAstPrinter.Visit(PrintStatement: TPrintStatement): TLoxValue;
 begin
-  Result.ValueType := TSSLangValueType.IS_STRING;
+  Result.ValueType := TLoxValueType.IS_STRING;
   Result.StrValue := Parenthesize('print', [PrintStatement.Expr]);
 end;
 
-function TAstPrinter.Visit(ContinueStatement: TContinueStatement): TSSLangValue;
+function TAstPrinter.Visit(ContinueStatement: TContinueStatement): TLoxValue;
 begin
-  Result.ValueType := TSSLangValueType.IS_STRING;
+  Result.ValueType := TLoxValueType.IS_STRING;
   Result.StrValue := 'continue';
 end;
 
 function TAstPrinter.Visit(ExpressionStatement: TExpressionStatement)
-  : TSSLangValue;
+  : TLoxValue;
 begin
-  Result.ValueType := TSSLangValueType.IS_STRING;
+  Result.ValueType := TLoxValueType.IS_STRING;
   Result.StrValue := Parenthesize(';', [ExpressionStatement.Expression]);
 end;
 
-function TAstPrinter.Visit(IfStatement: TIfStatement): TSSLangValue;
+function TAstPrinter.Visit(IfStatement: TIfStatement): TLoxValue;
 begin
-  Result.ValueType := TSSLangValueType.IS_STRING;
+  Result.ValueType := TLoxValueType.IS_STRING;
 
   if (IfStatement.elseBranch = nil) then
   begin
@@ -356,12 +356,12 @@ begin
   end;
 end;
 
-function TAstPrinter.Visit(FunctionStatement: TFunctionStatement): TSSLangValue;
+function TAstPrinter.Visit(FunctionStatement: TFunctionStatement): TLoxValue;
 var
   Param: TToken;
   Body: TStatement;
 begin
-  Result.ValueType := TSSLangValueType.IS_STRING;
+  Result.ValueType := TLoxValueType.IS_STRING;
   Result.StrValue := UTF8Encode('(fun ' + FunctionStatement.Name.Lexeme + '(');
 
   for Param in FunctionStatement.Params do

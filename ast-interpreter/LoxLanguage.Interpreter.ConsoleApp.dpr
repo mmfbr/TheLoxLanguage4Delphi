@@ -22,7 +22,7 @@ uses
   LoxLanguage.Interpreter.Resolver in 'LoxLanguage.Interpreter.Resolver.pas';
 
 var
-  SSLangRun: TSSLangRunner;
+  LoxRunner: TLoxRunner;
 //  Script: string;
 begin
   ReportMemoryLeaksOnShutdown := True;
@@ -135,9 +135,9 @@ begin
 //            '                              ';
 //
 //
-//  SSLangRun := TSSLangRunner.Create();
-//  SSLangRun.RunScript(Script);
-//  SSLangRun.Free();
+//  LoxRunner := TLoxRunnerner.Create();
+//  LoxRunner.RunScript(Script);
+//  LoxRunner.Free();
 //  Exit();
 
 
@@ -150,11 +150,11 @@ begin
   end
   else if (ParamCount = 1) then
   begin
-    SSLangRun := TSSLangRunner.Create();
+    LoxRunner := TLoxRunner.Create();
     try
-		SSLangRun.RunFile(ParamStr(1));
+		LoxRunner.RunFile(ParamStr(1));
     finally
-      FreeAndNil(SSLangRun);
+      FreeAndNil(LoxRunner);
     end;
   end;
 

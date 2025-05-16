@@ -38,7 +38,7 @@ type
   TFunctionType = (NONE, &FUNCTION, INITIALIZER, METHOD);
   TClassType = (NONE, &CLASS, SUBCLASS);
 
-  TSSLangValueType = (
+  TLoxValueType = (
     IS_UNDEF     = 0,
     IS_NULL      = 1,
     IS_FALSE     = 2,
@@ -55,13 +55,13 @@ type
     IS_METHOD    = 13
   );
 
-  TSSLangCallableValue = Pointer;
-  TSSLangObjectValue = Pointer;
-  TSSLangClassValue = Pointer;
-  TSSLangMethodValue = Pointer;
+  TLoxCallableValue = Pointer;
+  TLoxObjectValue = Pointer;
+  TLoxClassValue = Pointer;
+  TLoxMethodValue = Pointer;
 
-  TSSLangValue = record
-    ValueType: TSSLangValueType;
+  TLoxValue = record
+    ValueType: TLoxValueType;
     case Byte of
       0: (Int32Value: Integer);
       1: (Int64Value: Int64);
@@ -69,33 +69,24 @@ type
       3: (StrValue: ShortString);
       4: (BooleanValue: Boolean);
       5: (CharValue: Char);
-      6: (CallableValue: TSSLangCallableValue);
-      7: (ClassValue: TSSLangClassValue);
-      8: (ObjectInstanceValue: TSSLangObjectValue);
-      9: (MethodValue: TSSLangMethodValue);
+      6: (CallableValue: TLoxCallableValue);
+      7: (ClassValue: TLoxClassValue);
+      8: (ObjectInstanceValue: TLoxObjectValue);
+      9: (MethodValue: TLoxMethodValue);
   end;
 
-//  TSSLangCallableValue = class
-//  private
-//    FArity: Integer;
-//  public
-//    function Call(Interpreter: Pointer; Arguments: TList<TSSLangValue>): TSSLangValue;
-//    property Arity: Integer read FArity;
-//  end;
-//
-//
   TToken = class
   private
     FTokenType: TTokenType;
     FLexeme: string;
-    FLiteral: TSSLangValue;
+    FLiteral: TLoxValue;
     FLineNro: Integer;
   public
-    constructor Create(TokenType: TTokenType; Lexeme: string; Literal: TSSLangValue; LineNro: Integer);
+    constructor Create(TokenType: TTokenType; Lexeme: string; Literal: TLoxValue; LineNro: Integer);
     function ToString(): string; override;
     property TokenType: TTokenType read FTokenType;
     property Lexeme: string read FLexeme;
-    property Literal: TSSLangValue read FLiteral;
+    property Literal: TLoxValue read FLiteral;
     property LineNro: Integer read FLineNro;
   end;
 
@@ -117,7 +108,7 @@ uses
 
 { TToken }
 
-constructor TToken.Create(TokenType: TTokenType; Lexeme: string; Literal: TSSLangValue; LineNro: Integer);
+constructor TToken.Create(TokenType: TTokenType; Lexeme: string; Literal: TLoxValue; LineNro: Integer);
 begin
   FTokenType := TokenType;
   FLexeme := Lexeme;
@@ -130,7 +121,7 @@ var
   StrValue: string;
 begin
 
-  if FLiteral.ValueType = TSSLangValueType.IS_STRING then
+  if FLiteral.ValueType = TLoxValueType.IS_STRING then
     StrValue := String(FLiteral.StrValue)
   else
     StrValue := '';
@@ -139,7 +130,6 @@ begin
                    [TEnumConversor<TTokenType>.ToString(FTokenType),
                    FLexeme,
                    StrValue]);
-  Result := 'vendao';
 end;
 
 { ERuntimeError }
@@ -150,7 +140,7 @@ begin
   FToken := Token;
 end;
 
-{ TSSLangValue }
+{ TLoxValue }
 
 initialization
   Keywords := TDictionary<string, TTokenType>.Create();

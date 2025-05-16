@@ -216,14 +216,14 @@ end;
 function TParser.primary(): TExpression;
 var
   Expr: TExpression;
-  Value: TSSLangValue;
+  Value: TLoxValue;
   Keyword,
   Method: TToken;
 begin
 
   if (Match(TTokenType.FALSE)) then
   begin
-    Value.ValueType := TSSLangValueType.IS_BOOLEAN;
+    Value.ValueType := TLoxValueType.IS_BOOLEAN;
     Value.BooleanValue := False;
     Result := TLiteralExpression.Create(Value);
     Exit();
@@ -231,7 +231,7 @@ begin
 
   if (Match(TTokenType.TRUE)) then
   begin
-    Value.ValueType := TSSLangValueType.IS_BOOLEAN;
+    Value.ValueType := TLoxValueType.IS_BOOLEAN;
     Value.BooleanValue := True;
     Result := TLiteralExpression.Create(Value);
     Exit();
@@ -239,7 +239,7 @@ begin
 
   if Match(TTokenType.NIL) then
   begin
-    Value.ValueType := TSSLangValueType.IS_NULL;
+    Value.ValueType := TLoxValueType.IS_NULL;
     Result := TLiteralExpression.Create(Value);
     Exit();
   end;
@@ -530,7 +530,7 @@ var
   Increment: TExpression;
   Body: TStatement;
   Statements: TObjectList<TStatement>;
-  Value: TSSLangValue;
+  Value: TLoxValue;
 begin
 
   Inc(FLoopDepth);
@@ -570,7 +570,7 @@ begin
 
     if (Condition = nil) then
     begin
-      Value.ValueType := TSSLangValueType.IS_BOOLEAN;
+      Value.ValueType := TLoxValueType.IS_BOOLEAN;
       Value.BooleanValue := True;
       Condition := TLiteralExpression.Create(Value);
     end;
@@ -656,7 +656,7 @@ function TParser.DoStatement: TStatement;
 var
   Body: TObjectList<TStatement>;
   Condition: TExpression;
-  Value: TSSLangValue;
+  Value: TLoxValue;
 begin
 
   Inc(FLoopDepth);
@@ -677,8 +677,8 @@ begin
     Body.Add(TIfStatement.Create(Condition, TBlockStatement.Create(TObjectList<TStatement>.Create()), TBreakStatement.Create()));
 
 
-    Value := Default(TSSLangValue);
-    Value.ValueType := TSSLangValueType.IS_BOOLEAN;
+    Value := Default(TLoxValue);
+    Value.ValueType := TLoxValueType.IS_BOOLEAN;
     Value.BooleanValue := True;
 
     Result := TWhileStatement.Create(TLiteralExpression.Create(Value), TBlockStatement.Create(Body));

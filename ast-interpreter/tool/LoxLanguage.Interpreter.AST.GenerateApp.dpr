@@ -60,7 +60,7 @@ begin
 
   AstItem := TAstItem.Create();
   AstItem.Name := 'TLiteral';
-  AstItem.Fields := 'Value: TSSLangValue';
+  AstItem.Fields := 'Value: TLoxValue';
   ExprGrupo.Items.Add(AstItem);
 
   AstItem := TAstItem.Create();
@@ -96,7 +96,6 @@ begin
   AstGrupos.Add(ExprGrupo);
 
 
-  // Definições do arquivo sslang.stmt.pas
   StmtGrupo := TAstGrupo.Create();
   StmtGrupo.Nome := 'Statement';
 
