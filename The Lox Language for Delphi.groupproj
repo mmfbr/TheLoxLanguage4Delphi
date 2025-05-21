@@ -15,6 +15,9 @@
         <Projects Include="vm-compiler\LoxLanguage.VirtualMachine.RunApp.dproj">
             <Dependencies/>
         </Projects>
+        <Projects Include="IDE\LoxIDE.dproj">
+            <Dependencies/>
+        </Projects>
     </ItemGroup>
     <ProjectExtensions>
         <Borland.Personality>Default.Personality.12</Borland.Personality>
@@ -59,14 +62,23 @@
     <Target Name="LoxLanguage_VirtualMachine_RunApp:Make">
         <MSBuild Projects="vm-compiler\LoxLanguage.VirtualMachine.RunApp.dproj" Targets="Make"/>
     </Target>
+    <Target Name="LoxIDE">
+        <MSBuild Projects="IDE\LoxIDE.dproj"/>
+    </Target>
+    <Target Name="LoxIDE:Clean">
+        <MSBuild Projects="IDE\LoxIDE.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="LoxIDE:Make">
+        <MSBuild Projects="IDE\LoxIDE.dproj" Targets="Make"/>
+    </Target>
     <Target Name="Build">
-        <CallTarget Targets="LoxLanguage_Interpreter_ConsoleApp;LoxLanguage_Interpreter_AST_GenerateApp;LoxLanguage_Interpreter_AST_PrinterApp;LoxLanguage_VirtualMachine_RunApp"/>
+        <CallTarget Targets="LoxLanguage_Interpreter_ConsoleApp;LoxLanguage_Interpreter_AST_GenerateApp;LoxLanguage_Interpreter_AST_PrinterApp;LoxLanguage_VirtualMachine_RunApp;LoxIDE"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="LoxLanguage_Interpreter_ConsoleApp:Clean;LoxLanguage_Interpreter_AST_GenerateApp:Clean;LoxLanguage_Interpreter_AST_PrinterApp:Clean;LoxLanguage_VirtualMachine_RunApp:Clean"/>
+        <CallTarget Targets="LoxLanguage_Interpreter_ConsoleApp:Clean;LoxLanguage_Interpreter_AST_GenerateApp:Clean;LoxLanguage_Interpreter_AST_PrinterApp:Clean;LoxLanguage_VirtualMachine_RunApp:Clean;LoxIDE:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="LoxLanguage_Interpreter_ConsoleApp:Make;LoxLanguage_Interpreter_AST_GenerateApp:Make;LoxLanguage_Interpreter_AST_PrinterApp:Make;LoxLanguage_VirtualMachine_RunApp:Make"/>
+        <CallTarget Targets="LoxLanguage_Interpreter_ConsoleApp:Make;LoxLanguage_Interpreter_AST_GenerateApp:Make;LoxLanguage_Interpreter_AST_PrinterApp:Make;LoxLanguage_VirtualMachine_RunApp:Make;LoxIDE:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>
