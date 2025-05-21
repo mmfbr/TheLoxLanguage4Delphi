@@ -1,4 +1,4 @@
-// Marcello Mello
+ï»¿// Marcello Mello
 // 28/09/2019
 
 program LoxLanguage.Interpreter.AST.GenerateApp;
@@ -22,7 +22,7 @@ var
 begin
   if (ParamCount <> 1) then
   begin
-    Writeln('uso: ' + TPath.GetFileNameWithoutExtension(ParamStr(0)) + ' <diretório de saída>');
+    Writeln('uso: ' + TPath.GetFileNameWithoutExtension(ParamStr(0)) + ' <diretÃ³rio de saÃ­da>');
     WriteLn;
     WriteLn('Pressione qualquer tecla para fechar...');
     ReadlN;

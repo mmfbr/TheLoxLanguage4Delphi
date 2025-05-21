@@ -1,4 +1,4 @@
-// Marcello Mello
+﻿// Marcello Mello
 // 13/05/2025
 //
 unit LoxLanguage.Interpreter.Types;
@@ -15,7 +15,7 @@ uses
 type
 
   TTokenType = (
-    // Tokens de caractere �nico
+    // Tokens de caractere único
     LEFT_PAREN, RIGHT_PAREN, LEFT_BRACE, RIGHT_BRACE,
     COMMA, DOT, MINUS, PLUS, SEMICOLON, SLASH, STAR,
 

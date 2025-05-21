@@ -1,4 +1,4 @@
-// Marcello Mello
+Ôªø// Marcello Mello
 // 28/09/2019
 
 unit LoxLanguage.Interpreter.AST.Generate;
@@ -42,7 +42,7 @@ begin
   Writer.Add('constructor ' + className + BaseName + '.Create(' + fieldList + ');');
   Writer.Add('begin');
 
-  // Armazenar par‚metros em campos.
+  // Armazenar par√¢metros em campos.
   Fields := FieldList.split(['; ']);
   for Field in Fields do
   begin
@@ -131,7 +131,7 @@ begin
   Writer.Add('//                                                                               ');
   Writer.Add('//               The Lox Language - Abstract Syntax Tree                         ');
   Writer.Add('//                                                                               ');
-  Writer.Add('// ESSE ARQUIVO … GERADO DE FORMA AUTOMATICA PELO PROGRAMA "GenerateApp.exe"     ');
+  Writer.Add('// ESSE ARQUIVO √â GERADO DE FORMA AUTOMATICA PELO PROGRAMA "GenerateApp.exe"     ');
   Writer.Add('//                                                                               ');
   Writer.Add('// GenerateApp: ' + ExtractFileName(ParamStr(0)));
   Writer.Add('// Data: ' + DateTimeToStr(Now()));

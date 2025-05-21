@@ -1,4 +1,4 @@
-// Marcello Mello
+Ôªø// Marcello Mello
 // 25/11/2019
 
 unit LoxLanguage.VirtualMachine.Scanner;
@@ -122,7 +122,7 @@ begin
       begin
         if (PeekNext() = '/') then
         begin
-          // Um coment·rio vai atÈ o final da linha.
+          // Um coment√°rio vai at√© o final da linha.
           while (Peek() <> #10) and not IsAtEnd() do
             Advance();
         end
@@ -224,7 +224,7 @@ begin
   end;
 
   if (isAtEnd()) then
-    Exit(ErrorToken('String n„o terminada.'));
+    Exit(ErrorToken('String n√£o terminada.'));
 
   // The closing quote.
   Advance();
@@ -302,7 +302,7 @@ begin
     '"': Exit(ScanString());
   end;
 
-  Result := ErrorToken('Car·ter inesperado.');
+  Result := ErrorToken('Car√°ter inesperado.');
 
 end;
 

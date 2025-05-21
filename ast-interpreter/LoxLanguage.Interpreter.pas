@@ -1,4 +1,4 @@
-// Marcello Mello
+ï»¿// Marcello Mello
 // 28/09/2019
 
 unit LoxLanguage.Interpreter;
@@ -240,7 +240,7 @@ begin
     (Right.ValueType = TLoxValueType.IS_DOUBLE) then
     Exit();
 
-  raise ERuntimeError.Create(TokenOperator, 'Operandos devem ser números.');
+  raise ERuntimeError.Create(TokenOperator, 'Operandos devem ser nÃºmeros.');
 end;
 
 function TInterpreter.Visit(BinaryExpression: TBinaryExpression): TLoxValue;
@@ -320,14 +320,14 @@ begin
         end
         else
           raise ERuntimeError.Create(BinaryExpression.Operador,
-            'Os operandos devem ter dois números ou duas strings');
+            'Os operandos devem ter dois nÃºmeros ou duas strings');
       end;
     TTokenType.SLASH:
       begin
         CheckNumberOperands(BinaryExpression.Operador, left, Right);
 
         if (Right.DoubleValue = 0) then
-          raise ERuntimeError.Create(BinaryExpression.Operador, 'Divisão por zero.');
+          raise ERuntimeError.Create(BinaryExpression.Operador, 'DivisÃ£o por zero.');
 
         Result.ValueType := TLoxValueType.IS_DOUBLE;
         Result.DoubleValue := left.DoubleValue / Right.DoubleValue;
@@ -378,7 +378,7 @@ begin
   if (Operand.ValueType = TLoxValueType.IS_DOUBLE) then
     Exit();
 
-  raise ERuntimeError.Create(Oper, 'O operando deve ser um número.');
+  raise ERuntimeError.Create(Oper, 'O operando deve ser um nÃºmero.');
 end;
 
 function TInterpreter.IsTruthy(Value: TLoxValue): Boolean;
@@ -492,7 +492,7 @@ begin
 
   if not(Obj.ValueType = TLoxValueType.IS_OBJECT) then
     raise ERuntimeError.Create(SetExpression.Name,
-      'Somente instâncias têm campos.');
+      'Somente instÃ¢ncias tÃªm campos.');
 
   Value := Evaluate(SetExpression.Value);
   TLoxObjectInstance(Obj.ObjectInstanceValue)
@@ -516,7 +516,7 @@ begin
   end;
 
   raise ERuntimeError.Create(GetExpression.Name,
-    'Somente instâncias têm propriedades.');
+    'Somente instÃ¢ncias tÃªm propriedades.');
 end;
 
 function TInterpreter.Visit(ClassStatement: TClassStatement): TLoxValue;
@@ -619,7 +619,7 @@ begin
     TLoxValueType.IS_CLASS, TLoxValueType.IS_OBJECT,
     TLoxValueType.IS_METHOD]) then
     raise ERuntimeError.Create(CallExpression.paren,
-      'Somente é permitido chamar funções e classes.');
+      'Somente Ã© permitido chamar funÃ§Ãµes e classes.');
 
   FuncValue := TCallable(Callee.CallableValue);
 

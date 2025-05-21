@@ -1,4 +1,4 @@
-// Marcello Mello
+﻿// Marcello Mello
 // 28/09/2019
 unit LoxLanguage.Interpreter.AST.Printer;
 

@@ -1,4 +1,4 @@
-// Marcello Mello
+Ôªø// Marcello Mello
 // 02/10/2019
 
 unit LoxLanguage.Interpreter.Env;
@@ -81,7 +81,7 @@ begin
   else if not (FEnclosing = nil) then
     Result := FEnclosing.Get(Name)
   else
-    raise ERuntimeError.Create(Name, 'Vari·vel indefinida "' + Name.Lexeme + '".');
+    raise ERuntimeError.Create(Name, 'Vari√°vel indefinida "' + Name.Lexeme + '".');
 
 end;
 
@@ -93,7 +93,7 @@ begin
   else if Assigned(FEnclosing) then
     FEnclosing.Assign(Name, Value)
   else
-    raise ERuntimeError.Create(Name, 'Vari·vel indefinida "' + name.lexeme + '".');
+    raise ERuntimeError.Create(Name, 'Vari√°vel indefinida "' + name.lexeme + '".');
 
 end;
 

@@ -1,4 +1,4 @@
-// Marcello Mello
+Ôªø// Marcello Mello
 // 28/09/2019
 
 unit LoxLanguage.Interpreter.Scanner;
@@ -123,20 +123,20 @@ begin
     begin
       if (match('/')) then
       begin
-        // Um coment·rio vai atÈ o final da linha.
+        // Um coment√°rio vai at√© o final da linha.
         while (Peek() <> #10) and not isAtEnd() do
           Advance();
       end
       else
         AddToken(TTokenType.SLASH);
     end;
-    ' ', #13, #9: ; // Ignorar espaÁo em branco, retorno do carro e tabulaÁ„o.
+    ' ', #13, #9: ; // Ignorar espa√ßo em branco, retorno do carro e tabula√ß√£o.
     #10: Inc(FLineNro); // Nova linha.
     '"': ScanString();
     '0'..'9': ScanNumber();
     'a'..'z', 'A'..'Z', '_': ScanIdentifier();
   else
-    Error(FLineNro, 'Car·ter inesperado.');
+    Error(FLineNro, 'Car√°ter inesperado.');
   end;
 
 end;
@@ -184,7 +184,7 @@ begin
   while IsDigit(Peek()) do
     Advance();
 
-  // Procure uma parte fracion·ria.
+  // Procure uma parte fracion√°ria.
   if (Peek() = '.') and isDigit(PeekNext()) then
   begin
     // Consuma o "."
@@ -219,10 +219,10 @@ begin
     Advance();
   end;
 
-  // String n„o terminada.
+  // String n√£o terminada.
   if (isAtEnd()) then
   begin
-    Error(FLineNro, 'String n„o terminada.');
+    Error(FLineNro, 'String n√£o terminada.');
     Exit();
   end;
 
@@ -278,7 +278,7 @@ begin
 
   while not IsAtEnd() do
   begin
-    // Estamos no inÌcio do prÛximo lÈxico.
+    // Estamos no in√≠cio do pr√≥ximo l√©xico.
     FStart := FCurrent;
     ScanToken();
   end;

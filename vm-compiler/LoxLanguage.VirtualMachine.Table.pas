@@ -1,4 +1,4 @@
-// Marcello Mello
+Ôªø// Marcello Mello
 // 25/11/2019
 
 unit LoxLanguage.VirtualMachine.Table;
@@ -91,7 +91,7 @@ begin
       end
       else
       begin
-        // Encontramos uma l·pide.
+        // Encontramos uma l√°pide.
         if (Tombstone = nil) then
           Tombstone := Entry;
       end;
@@ -150,7 +150,7 @@ begin
   if (Entry^.Key = nil) then
     Exit(False);
 
-  // Coloque uma l·pide na entrada. (Sepultamento da entrada na tabela)
+  // Coloque uma l√°pide na entrada. (Sepultamento da entrada na tabela)
   Entry^.Key := nil;
   Entry^.Value := BOOL_VAL(True);
 
@@ -209,14 +209,14 @@ begin
 
     if (Entry^.Key = nil) then
     begin
-      // Pare se encontrarmos uma entrada vazia que n„o seja uma l·pide.
+      // Pare se encontrarmos uma entrada vazia que n√£o seja uma l√°pide.
       if (IS_NIL(Entry^.Value)) then
         Exit(nil);
     end
     else if (entry^.key^.length = length) and
             (entry^.key^.hash = hash) and
             CompareMem(entry^.key^.Chars, Chars, length)  then
-      // NÛs achamos.
+      // N√≥s achamos.
     begin
       Exit(Entry^.Key);
     end;

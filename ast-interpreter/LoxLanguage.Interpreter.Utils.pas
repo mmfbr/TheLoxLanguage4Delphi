@@ -1,4 +1,4 @@
-// Marcello Mello
+Ôªø// Marcello Mello
 // 28/09/2019
 
 unit LoxLanguage.Interpreter.Utils;
@@ -51,7 +51,7 @@ begin
     P := @num;
     result := P^;
   except
-    raise EConvertError.Create('O Par‚metro "' + Str + '" passado n„o ' +
+    raise EConvertError.Create('O Par√¢metro "' + Str + '" passado n√£o ' +
       sLineBreak + ' corresponde a um Tipo Enumerado ' + GetTypeName(TypeInfo(T)));
   end;
 end;
@@ -88,7 +88,7 @@ begin
     num := Integer(TGenerico((P^)));
     result := GetEnumName(TypeInfo(T), num);
   except
-    raise EConvertError.Create('O Par‚metro passado n„o corresponde a ' +
+    raise EConvertError.Create('O Par√¢metro passado n√£o corresponde a ' +
       sLineBreak + 'Ou a um Tipo Enumerado ' + GetTypeName(TypeInfo(T)));
   end;
 end;

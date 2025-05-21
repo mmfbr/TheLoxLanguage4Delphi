@@ -1,6 +1,6 @@
-// Marcello Mello
+ï»¿// Marcello Mello
 // 28/09/2019
-// LPS (Linguagem de programação Se7e)
+// LPS (Linguagem de programaÃ§Ã£o Se7e)
 // Lets go
 
 program LoxLanguage.Interpreter.ConsoleApp;

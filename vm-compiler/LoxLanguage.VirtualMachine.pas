@@ -1,4 +1,4 @@
-// Marcello Mello
+ï»¿// Marcello Mello
 // 25/11/2019
 
 unit LoxLanguage.VirtualMachine;
@@ -241,7 +241,7 @@ begin
 
   if not tableGet(@klass^.methods, name, @method) then
   begin
-    runtimeError('Somente instâncias têm propriedades... "%s".', [name^.chars]);
+    runtimeError('Somente instÃ¢ncias tÃªm propriedades... "%s".', [name^.chars]);
     Exit(False);
   end;
 
@@ -303,7 +303,7 @@ begin
 
   if not IS_INSTANCE(Receiver) then
   begin
-    runtimeError('Somente instâncias têm métodos.', []);
+    runtimeError('Somente instÃ¢ncias tÃªm mÃ©todos.', []);
     Exit(false);
   end;
 
@@ -423,7 +423,7 @@ begin
         Name := READ_STRING();
         if not TableGet(@VM.Globals, Name, @Value) then
         begin
-          RuntimeError('Variável indefinida "%s".', [Name^.Chars]);
+          RuntimeError('VariÃ¡vel indefinida "%s".', [Name^.Chars]);
           Exit(TInterpretResult.INTERPRET_RUNTIME_ERROR);
         end;
         push(value);
@@ -440,7 +440,7 @@ begin
         if (TableSet(@VM.Globals, Name, Peek(0))) then
         begin
           TableDelete(@vm.globals, Name);
-          RuntimeError('Variável indefinida "%s".', [Name^.Chars]);
+          RuntimeError('VariÃ¡vel indefinida "%s".', [Name^.Chars]);
           Exit(TInterpretResult.INTERPRET_RUNTIME_ERROR);
         end;
       end;
@@ -458,7 +458,7 @@ begin
       begin
         if not IS_INSTANCE(peek(0)) then
         begin
-          RuntimeError('Somente instâncias têm propriedades.', []);
+          RuntimeError('Somente instÃ¢ncias tÃªm propriedades.', []);
           Exit(TInterpretResult.INTERPRET_RUNTIME_ERROR);
         end;
 
@@ -479,7 +479,7 @@ begin
       begin
         if not IS_INSTANCE(peek(1)) then
         begin
-          runtimeError('Somente instâncias têm campos.', []);
+          runtimeError('Somente instÃ¢ncias tÃªm campos.', []);
           Exit(TInterpretResult.INTERPRET_RUNTIME_ERROR);
         end;
 
@@ -519,7 +519,7 @@ begin
         end
         else
         begin
-          RuntimeError('Os operandos devem ter dois números ou duas strings.', []);
+          RuntimeError('Os operandos devem ter dois nÃºmeros ou duas strings.', []);
           Exit(TInterpretResult.INTERPRET_RUNTIME_ERROR);
         end;
       end;
@@ -531,7 +531,7 @@ begin
       begin
         if not IS_NUMBER(Peek(0)) then
         begin
-          RuntimeError('O operando deve ser um número.', []);
+          RuntimeError('O operando deve ser um nÃºmero.', []);
           Exit(TInterpretResult.INTERPRET_RUNTIME_ERROR);
         end;
 
@@ -749,7 +749,7 @@ begin
     end;
   end;
 
-  RuntimeError('Só pode fazer chamada de funções e classes.', []);
+  RuntimeError('SÃ³ pode fazer chamada de funÃ§Ãµes e classes.', []);
   Result := False;
 end;
 

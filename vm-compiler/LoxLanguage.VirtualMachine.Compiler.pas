@@ -1,4 +1,4 @@
-// Marcello Mello
+Ôªø// Marcello Mello
 // 25/11/2019
 
 unit LoxLanguage.VirtualMachine.Compiler;
@@ -231,7 +231,7 @@ begin
 
   Offset := currentChunk()^.count - loopStart + 2;
   if (offset > UINT16_MAX) then
-    error('Corpo do laÁo muito grande.');
+    error('Corpo do la√ßo muito grande.');
 
   emitByte((offset shr 8) and $ff);
   emitByte(offset and $ff);
@@ -261,7 +261,7 @@ begin
   Constant := AddConstant(CurrentChunk(), Value);
   if Constant > UINT8_MAX then
   begin
-    error('Muitas constantes em um pedaÁo.');
+    error('Muitas constantes em um peda√ßo.');
     Exit(0);
   end;
 
@@ -384,7 +384,7 @@ end;
 procedure Grouping(CanAssign: Boolean);
 begin
   Expression();
-  Consume(TTokenType.TOKEN_RIGHT_PAREN, 'Esperado ")" depois da express„o.');
+  Consume(TTokenType.TOKEN_RIGHT_PAREN, 'Esperado ")" depois da express√£o.');
 end;
 
 procedure Call(CanAssign: Boolean);
@@ -434,7 +434,7 @@ begin
   jump := CurrentChunk()^.count - offset - 2;
 
   if (jump > UINT16_MAX) then
-    error('Muito cÛdigo para pular.');
+    error('Muito c√≥digo para pular.');
 
   currentChunk()^.code[offset] := (jump shr 8) and $ff;
   currentChunk()^.code[offset + 1] := jump and $ff;
@@ -516,7 +516,7 @@ begin
 
   if not Assigned(PrefixRule) then
   begin
-    Error('Esperado express„o.');
+    Error('Esperado express√£o.');
     Exit();
   end;
 
@@ -533,7 +533,7 @@ begin
 
   if CanAssign and Match(TTokenType.TOKEN_EQUAL) then
   begin
-    Error('Destino de atribuiÁ„o inv·lido.');
+    Error('Destino de atribui√ß√£o inv√°lido.');
     Expression();
   end;
 end;
@@ -562,7 +562,7 @@ begin
     if (IdentifiersEqual(name, @local^.name)) then
     begin
       if (local^.depth = -1) then
-        error('N„o È possÌvel ler a vari·vel local em seu prÛprio inicializador.');
+        error('N√£o √© poss√≠vel ler a vari√°vel local em seu pr√≥prio inicializador.');
 
       Exit(i);
     end;
@@ -588,7 +588,7 @@ begin
 
   if (UpvalueCount = UINT8_COUNT) then
   begin
-    Error('Muitas vari·veis de fechamento na funÁ„o.');
+    Error('Muitas vari√°veis de fechamento na fun√ß√£o.');
     Exit(0);
   end;
 
@@ -626,7 +626,7 @@ var
 begin
   if (current^.localCount = UINT8_COUNT) then
   begin
-    error('Muitas vari·veis locais na funÁ„o.');
+    error('Muitas vari√°veis locais na fun√ß√£o.');
     Exit;
   end;
 
@@ -657,7 +657,7 @@ begin
       break;
 
     if IdentifiersEqual(name, @local^.name) then
-      error('Vari·vel com este nome j· declarada neste escopo.');
+      error('Vari√°vel com este nome j√° declarada neste escopo.');
   end;
 
   addLocal(name^);
@@ -706,7 +706,7 @@ begin
       Expression();
 
       if (ArgCount = 255) then
-        Error('N„o pode ter mais de 255 argumentos.');
+        Error('N√£o pode ter mais de 255 argumentos.');
 
       ArgCount := ArgCount + 1;
     until not (Match(TTokenType.TOKEN_COMMA));
@@ -755,7 +755,7 @@ begin
   BeginScope();
 
   // Compile the parameter list.
-  Consume(TTokenType.TOKEN_LEFT_PAREN, 'Esperado "(" apÛs o nome da funÁ„o.');
+  Consume(TTokenType.TOKEN_LEFT_PAREN, 'Esperado "(" ap√≥s o nome da fun√ß√£o.');
 
 
   if not Check(TTokenType.TOKEN_RIGHT_PAREN) then
@@ -763,17 +763,17 @@ begin
     repeat
       Current^.Func^.Arity := Current^.Func^.Arity + 1;
       if (Current^.Func^.arity > 255) then
-        ErrorAtCurrent('N„o pode ter mais de 255 par‚metros.');
+        ErrorAtCurrent('N√£o pode ter mais de 255 par√¢metros.');
 
-      ParamConstant := ParseVariable('Espere o nome do par‚metro.');
+      ParamConstant := ParseVariable('Espere o nome do par√¢metro.');
       DefineVariable(ParamConstant);
     until not Match(TTokenType.TOKEN_COMMA);
   end;
 
-  Consume(TTokenType.TOKEN_RIGHT_PAREN, 'Esperado ")" depois dos par‚metros.');
+  Consume(TTokenType.TOKEN_RIGHT_PAREN, 'Esperado ")" depois dos par√¢metros.');
 
   // The body.
-  Consume(TTokenType.TOKEN_LEFT_BRACE, 'Esperado "{" antes do corpo da funÁ„o.');
+  Consume(TTokenType.TOKEN_LEFT_BRACE, 'Esperado "{" antes do corpo da fun√ß√£o.');
   Block();
 
   // Create the function object.
@@ -802,7 +802,7 @@ procedure FunDeclaration();
 var
   Global: UInt8;
 begin
-  Global := ParseVariable('Esperado o nome da funÁ„o.');
+  Global := ParseVariable('Esperado o nome da fun√ß√£o.');
   MarkInitialized();
 
   Func(TFunctionType.TYPE_FUNCTION);
@@ -814,14 +814,14 @@ procedure VarDeclaration();
 var
   Global: UInt8;
 begin
-  Global := ParseVariable('Esperado o nome da vari·vel.');
+  Global := ParseVariable('Esperado o nome da vari√°vel.');
 
   if Match(TTokenType.TOKEN_EQUAL) then
     Expression()
   else
     EmitByte(Byte(TOpCode.OP_NIL));
 
-  consume(TTokenType.TOKEN_SEMICOLON, 'Esperado ";" apÛs declaraÁ„o de vari·vel.');
+  consume(TTokenType.TOKEN_SEMICOLON, 'Esperado ";" ap√≥s declara√ß√£o de vari√°vel.');
 
   DefineVariable(Global);
 end;
@@ -829,7 +829,7 @@ end;
 procedure ExpressionStatement();
 begin
   Expression();
-  Consume(TTokenType.TOKEN_SEMICOLON, 'Esperado ";" depois da express„o.');
+  Consume(TTokenType.TOKEN_SEMICOLON, 'Esperado ";" depois da express√£o.');
   EmitByte(Byte(TOpCode.OP_POP));
 end;
 
@@ -857,7 +857,7 @@ begin
   if (not match(TTokenType.TOKEN_SEMICOLON)) then
   begin
     expression();
-    consume(TTokenType.TOKEN_SEMICOLON, 'Esperado ";" apÛs condiÁ„o do loop.');
+    consume(TTokenType.TOKEN_SEMICOLON, 'Esperado ";" ap√≥s condi√ß√£o do loop.');
 
     // Jump out of the loop if the condition is false.
     exitJump := emitJump(Byte(TOpCode.OP_JUMP_IF_FALSE));
@@ -898,7 +898,7 @@ var
 begin
   Consume(TTokenType.TOKEN_LEFT_PAREN, 'Esperado "(" apos "if".');
   Expression();
-  Consume(TTokenType.TOKEN_RIGHT_PAREN, 'Esperado ")" apÛs condiÁ„o.');
+  Consume(TTokenType.TOKEN_RIGHT_PAREN, 'Esperado ")" ap√≥s condi√ß√£o.');
 
   ThenJump := EmitJump(Byte(TOpCode.OP_JUMP_IF_FALSE));
   emitByte(Byte(TOpCode.OP_POP));
@@ -925,17 +925,17 @@ end;
 procedure ReturnStatement();
 begin
   if (Current^.FunctionType = TFunctionType.TYPE_SCRIPT) then
-    Error('N„o È possÌvel retornar do cÛdigo de nÌvel superior.');
+    Error('N√£o √© poss√≠vel retornar do c√≥digo de n√≠vel superior.');
 
   if (Match(TTokenType.TOKEN_SEMICOLON)) then
     EmitReturn()
   else
   begin
     if (Current^.FunctionType = TFunctionType.TYPE_INITIALIZER) then
-      Error('N„o È possÌvel retornar um valor de um inicializador.');
+      Error('N√£o √© poss√≠vel retornar um valor de um inicializador.');
 
     Expression();
-    Consume(TTokenType.TOKEN_SEMICOLON, 'Esperado ";" apÛs o valor de retorno.');
+    Consume(TTokenType.TOKEN_SEMICOLON, 'Esperado ";" ap√≥s o valor de retorno.');
     EmitByte(Byte(TOpCode.OP_RETURN));
   end;
 end;
@@ -948,7 +948,7 @@ begin
   loopStart := currentChunk()^.count;
   consume(TTokenType.TOKEN_LEFT_PAREN, 'Esperado "(" apos "while".');
   expression();
-  consume(TTokenType.TOKEN_RIGHT_PAREN, 'Esperado ")" apos a condiÁ„o.');
+  consume(TTokenType.TOKEN_RIGHT_PAREN, 'Esperado ")" apos a condi√ß√£o.');
 
   exitJump := emitJump(Byte(TOpCode.OP_JUMP_IF_FALSE));
 
@@ -1072,12 +1072,12 @@ var
   argCount: UInt8;
 begin
   if (CurrentClass = nil) then
-    Error('N„o È possÌvel usar "super" fora de uma classe.')
+    Error('N√£o √© poss√≠vel usar "super" fora de uma classe.')
   else if not currentClass^.hasSuperclass then
-    error('N„o È possÌvel usar "super" em uma classe sem superclasse.');
+    error('N√£o √© poss√≠vel usar "super" em uma classe sem superclasse.');
 
   Consume(TTokenType.TOKEN_DOT, 'Esperado "." apos "super".');
-  Consume(TTokenType.TOKEN_IDENTIFIER, 'Espere o nome do mÈtodo da superclasse.');
+  Consume(TTokenType.TOKEN_IDENTIFIER, 'Espere o nome do m√©todo da superclasse.');
   Name := IdentifierConstant(@parser.previous);
 
   // Push the receiver.
@@ -1103,7 +1103,7 @@ end;
 procedure This_(canAssign: Boolean);
 begin
   if (CurrentClass = nil) then
-    error('N„o È possÌvel usar "this" fora de uma classe.')
+    error('N√£o √© poss√≠vel usar "this" fora de uma classe.')
   else
     variable(False);
 
@@ -1117,7 +1117,7 @@ var
   constant: UInt8;
   FunctionType: TFunctionType;
 begin
-  consume(TTokenType.TOKEN_IDENTIFIER, 'Espere o nome do mÈtodo.');
+  consume(TTokenType.TOKEN_IDENTIFIER, 'Espere o nome do m√©todo.');
   Constant := IdentifierConstant(@parser.previous);
 
   // If the method is named "init", it's an initializer.
@@ -1155,7 +1155,7 @@ begin
     consume(TTokenType.TOKEN_IDENTIFIER, 'Esperado o nome da superclasse.');
 
     if (identifiersEqual(@className, @parser.previous)) then
-      error('Uma classe n„o pode herdar de si mesma.');
+      error('Uma classe n√£o pode herdar de si mesma.');
 
     classCompiler.HasSuperclass := True;
 

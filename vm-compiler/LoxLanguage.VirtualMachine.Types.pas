@@ -1,4 +1,4 @@
-// Marcello Mello
+﻿// Marcello Mello
 // 25/11/2019
 
 unit LoxLanguage.VirtualMachine.Types;

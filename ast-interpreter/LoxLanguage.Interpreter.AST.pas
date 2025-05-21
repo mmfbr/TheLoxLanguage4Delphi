@@ -1,8 +1,8 @@
-// ******************************************************************************
+﻿// ******************************************************************************
 //                                                                               
 //               The Lox Language - Abstract Syntax Tree                         
 //                                                                               
-// ESSE ARQUIVO � GERADO DE FORMA AUTOMATICA PELO PROGRAMA "GenerateApp.exe"     
+// ESSE ARQUIVO É GERADO DE FORMA AUTOMATICA PELO PROGRAMA "GenerateApp.exe"     
 //                                                                               
 // GenerateApp: LoxLanguage.Interpreter.AST.GenerateApp.exe
 // Data: 15/05/2025 21:04:20

@@ -1,4 +1,4 @@
-// Marcello Mello
+Ôªø// Marcello Mello
 // 02/10/2019
 
 unit LoxLanguage.Interpreter.Resolver;
@@ -106,7 +106,7 @@ end;
 function TResolver.Visit(VariableExpression: TVariableExpression): TLoxValue;
 begin
   if (not FScopes.Count = 0) and (FScopes.peek()[VariableExpression.Name.Lexeme] = False) then
-    Error(VariableExpression.Name, 'N„o È possÌvel ler a vari·vel local em seu prÛprio inicializador.');
+    Error(VariableExpression.Name, 'N√£o √© poss√≠vel ler a vari√°vel local em seu pr√≥prio inicializador.');
 
   ResolveLocal(VariableExpression, VariableExpression.Name);
 
@@ -128,7 +128,7 @@ begin
     end;
   end;
 
-  // N„o encontrado. Suponha que seja global.
+  // N√£o encontrado. Suponha que seja global.
 end;
 
 function TResolver.Visit(AssignExpression: TAssignExpression): TLoxValue;
@@ -181,13 +181,13 @@ end;
 function TResolver.Visit(ReturnStatement: TReturnStatement): TLoxValue;
 begin
   if (FCurrentFunction = TFunctionType.NONE) then
-    Error(ReturnStatement.Keyword, 'N„o È possÌvel retornar do cÛdigo de nÌvel superior.');
+    Error(ReturnStatement.Keyword, 'N√£o √© poss√≠vel retornar do c√≥digo de n√≠vel superior.');
 
 
   if Assigned(ReturnStatement.Value) then
   begin
     if (FCurrentFunction = TFunctionType.INITIALIZER) then
-      Error(ReturnStatement.Keyword, 'N„o È possÌvel retornar um valor de um inicializador.');
+      Error(ReturnStatement.Keyword, 'N√£o √© poss√≠vel retornar um valor de um inicializador.');
 
     Resolve(ReturnStatement.Value);
   end;
@@ -206,7 +206,7 @@ begin
   Scope := FScopes.Peek();
 
   if Scope.ContainsKey(Name.lexeme) then
-    Error(name, 'Vari·vel com este nome j· declarada neste escopo.');
+    Error(name, 'Vari√°vel com este nome j√° declarada neste escopo.');
 
   Scope.Add(Name.Lexeme, False);
 end;
@@ -274,9 +274,9 @@ end;
 function TResolver.Visit(SuperExpression: TSuperExpression): TLoxValue;
 begin
   if (FCurrentClass = TClassType.NONE) then
-    Error(SuperExpression.Keyword, 'N„o È possÌvel usar "super" fora de uma classe.')
+    Error(SuperExpression.Keyword, 'N√£o √© poss√≠vel usar "super" fora de uma classe.')
   else if not (FCurrentClass = TClassType.SUBCLASS) then
-    Error(SuperExpression.Keyword, 'N„o È possÌvel usar "super" em uma classe sem superclasse.');
+    Error(SuperExpression.Keyword, 'N√£o √© poss√≠vel usar "super" em uma classe sem superclasse.');
 
   ResolveLocal(SuperExpression, SuperExpression.Keyword);
 
@@ -288,7 +288,7 @@ function TResolver.Visit(ThisExpression: TThisExpression): TLoxValue;
 begin
   if (FCurrentClass = TClassType.NONE) then
   begin
-    Error(ThisExpression.Keyword, 'N„o È possÌvel usar "this" fora de uma classe.');
+    Error(ThisExpression.Keyword, 'N√£o √© poss√≠vel usar "this" fora de uma classe.');
 
     Result := Default(TLoxValue);
     Result.ValueType := TLoxValueType.IS_NULL;
@@ -331,7 +331,7 @@ begin
   Define(ClassStatement.Name);
 
   if Assigned(ClassStatement.SuperClass) and (ClassStatement.Name.Lexeme = ClassStatement.SuperClass.Name.Lexeme) then
-    Error(ClassStatement.Superclass.Name, 'Uma classe n„o pode herdar de si mesma.');
+    Error(ClassStatement.Superclass.Name, 'Uma classe n√£o pode herdar de si mesma.');
 
   if Assigned(ClassStatement.Superclass) then
   begin

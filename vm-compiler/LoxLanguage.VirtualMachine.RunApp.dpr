@@ -1,4 +1,4 @@
-program LoxLanguage.VirtualMachine.RunApp;
+﻿program LoxLanguage.VirtualMachine.RunApp;
 
 {$APPTYPE CONSOLE}
 
