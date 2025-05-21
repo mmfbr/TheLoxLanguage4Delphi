@@ -16,23 +16,56 @@ type
 
   TTokenType = (
     // Tokens de caractere único
-    LEFT_PAREN, RIGHT_PAREN, LEFT_BRACE, RIGHT_BRACE,
-    COMMA, DOT, MINUS, PLUS, SEMICOLON, SLASH, STAR,
+    LEFT_PAREN_SYMBOL,
+    RIGHT_PAREN_SYMBOL,
+    LEFT_BRACE_SYMBOL,
+    RIGHT_BRACE_SYMBOL,
+    COMMA_SYMBOL,
+    DOT_SYMBOL,
+    MINUS_SYMBOL,
+    PLUS_SYMBOL,
+    SEMICOLON_SYMBOL,
+    SLASH_SYMBOL,
+    STAR_SYMBOL,
 
     // Um ou dois tokens de caracteres
-    BANG, BANG_EQUAL,
-    EQUAL, EQUAL_EQUAL,
-    GREATER, GREATER_EQUAL,
-    LESS, LESS_EQUAL,
+    NOT_SYMBOL,
+    NOT_EQUAL_PAIRS_SYMBOL,
+    EQUAL_SYMBOL,
+    EQUAL_EQUAL_PAIRS_SYMBOL,
+    GREATER_SYMBOL,
+    GREATER_EQUAL_PAIRS_SYMBOL,
+    LESS_SYMBOL,
+    LESS_EQUAL_PAIRS_SYMBOL,
 
     // Literais
-    IDENTIFIER, &STRING, NUMBER, &INTEGER,
+    IDENTIFIER_TOKEN,
+    STRING_LITERAL,
+    NUMBER_LITERAL,
+    INTEGER_LITERAL,
 
     // Palavras-chave
-    &AND, &BREAK, &CLASS, &CONTINUE, &DO, &ELSE, &FALSE, &FUN, &FOR, &IF, &NIL, &OR,
-    &PRINT, &RETURN, SUPER, THIS, &TRUE, &VAR, &WHILE,
+    AND_KEYWORD,
+    BREAK_KEYWORD,
+    CLASS_KEYWORD,
+    CONTINUE_KEYWORD,
+    DO_KEYWORD,
+    ELSE_KEYWORD,
+    FALSE_KEYWORD,
+    FUN_KEYWORD,
+    FOR_KEYWORD,
+    IF_KEYWORD,
+    NIL_KEYWORD,
+    OR_KEYWORD,
+    PRINT_KEYWORD,
+    RETURN_KEYWORD,
+    SUPER_KEYWORD,
+    THIS_KEYWORD,
+    TRUE_KEYWORD,
+    VAR_KEYWORD,
+    WHILE_KEYWORD,
 
-    EOF
+    END_OF_FILE_TOKEN
   );
 
   TFunctionType = (NONE, &FUNCTION, INITIALIZER, METHOD);
@@ -144,25 +177,25 @@ end;
 
 initialization
   Keywords := TDictionary<string, TTokenType>.Create();
-  keywords.Add('and',    TTokenType.AND);
-  keywords.Add('break',  TTokenType.BREAK);
-  keywords.Add('class',  TTokenType.CLASS);
-  keywords.Add('continue',  TTokenType.continue);
-  keywords.Add('do',  TTokenType.DO);
-  keywords.Add('else',   TTokenType.ELSE);
-  keywords.Add('false',  TTokenType.FALSE);
-  keywords.Add('for',    TTokenType.FOR);
-  keywords.Add('fun',    TTokenType.FUN);
-  keywords.Add('if',     TTokenType.IF);
-  keywords.Add('nil',    TTokenType.NIL);
-  keywords.Add('or',     TTokenType.OR);
-  keywords.Add('print',  TTokenType.PRINT);
-  keywords.Add('return', TTokenType.RETURN);
-  keywords.Add('super',  TTokenType.SUPER);
-  keywords.Add('this',   TTokenType.THIS);
-  keywords.Add('true',   TTokenType.TRUE);
-  keywords.Add('var',    TTokenType.VAR);
-  keywords.Add('while',  TTokenType.WHILE);
+  keywords.Add('and',    TTokenType.AND_KEYWORD);
+  keywords.Add('break',  TTokenType.BREAK_KEYWORD);
+  keywords.Add('class',  TTokenType.CLASS_KEYWORD);
+  keywords.Add('continue',  TTokenType.CONTINUE_KEYWORD);
+  keywords.Add('do',  TTokenType.DO_KEYWORD);
+  keywords.Add('else',   TTokenType.ELSE_KEYWORD);
+  keywords.Add('false',  TTokenType.FALSE_KEYWORD);
+  keywords.Add('for',    TTokenType.FOR_KEYWORD);
+  keywords.Add('fun',    TTokenType.FUN_KEYWORD);
+  keywords.Add('if',     TTokenType.IF_KEYWORD);
+  keywords.Add('nil',    TTokenType.NIL_KEYWORD);
+  keywords.Add('or',     TTokenType.OR_KEYWORD);
+  keywords.Add('print',  TTokenType.PRINT_KEYWORD);
+  keywords.Add('return', TTokenType.RETURN_KEYWORD);
+  keywords.Add('super',  TTokenType.SUPER_KEYWORD);
+  keywords.Add('this',   TTokenType.THIS_KEYWORD);
+  keywords.Add('true',   TTokenType.TRUE_KEYWORD);
+  keywords.Add('var',    TTokenType.VAR_KEYWORD);
+  keywords.Add('while',  TTokenType.WHILE_KEYWORD);
 
 finalization
   Keywords.Free();

@@ -105,20 +105,20 @@ begin
   c := Advance();
 
   case (c) of
-    '(': AddToken(TTokenType.LEFT_PAREN);
-    ')': AddToken(TTokenType.RIGHT_PAREN);
-    '{': AddToken(TTokenType.LEFT_BRACE);
-    '}': AddToken(TTokenType.RIGHT_BRACE);
-    ',': AddToken(TTokenType.COMMA);
-    '.': AddToken(TTokenType.DOT);
-    '-': AddToken(TTokenType.MINUS);
-    '+': AddToken(TTokenType.PLUS);
-    ';': AddToken(TTokenType.SEMICOLON);
-    '*': AddToken(TTokenType.STAR);
-    '!': AddToken(IfThen(Match('='), TTokenType.BANG_EQUAL, TTokenType.BANG));
-    '=': AddToken(IfThen(Match('='), TTokenType.EQUAL_EQUAL, TTokenType.EQUAL));
-    '<': AddToken(IfThen(Match('='), TTokenType.LESS_EQUAL, TTokenType.LESS));
-    '>': AddToken(IfThen(Match('='), TTokenType.GREATER_EQUAL, TTokenType.GREATER));
+    '(': AddToken(TTokenType.LEFT_PAREN_SYMBOL);
+    ')': AddToken(TTokenType.RIGHT_PAREN_SYMBOL);
+    '{': AddToken(TTokenType.LEFT_BRACE_SYMBOL);
+    '}': AddToken(TTokenType.RIGHT_BRACE_SYMBOL);
+    ',': AddToken(TTokenType.COMMA_SYMBOL);
+    '.': AddToken(TTokenType.DOT_SYMBOL);
+    '-': AddToken(TTokenType.MINUS_SYMBOL);
+    '+': AddToken(TTokenType.PLUS_SYMBOL);
+    ';': AddToken(TTokenType.SEMICOLON_SYMBOL);
+    '*': AddToken(TTokenType.STAR_SYMBOL);
+    '!': AddToken(IfThen(Match('='), TTokenType.NOT_EQUAL_PAIRS_SYMBOL, TTokenType.NOT_SYMBOL));
+    '=': AddToken(IfThen(Match('='), TTokenType.EQUAL_EQUAL_PAIRS_SYMBOL, TTokenType.EQUAL_SYMBOL));
+    '<': AddToken(IfThen(Match('='), TTokenType.LESS_EQUAL_PAIRS_SYMBOL, TTokenType.LESS_SYMBOL));
+    '>': AddToken(IfThen(Match('='), TTokenType.GREATER_EQUAL_PAIRS_SYMBOL, TTokenType.GREATER_SYMBOL));
     '/':
     begin
       if (match('/')) then
@@ -128,7 +128,7 @@ begin
           Advance();
       end
       else
-        AddToken(TTokenType.SLASH);
+        AddToken(TTokenType.SLASH_SYMBOL);
     end;
     ' ', #13, #9: ; // Ignorar espaço em branco, retorno do carro e tabulação.
     #10: Inc(FLineNro); // Nova linha.
@@ -154,7 +154,7 @@ begin
   Text := Copy(FSource, FStart, FCurrent - FStart);
 
   if not Keywords.TryGetValue(Text, TokenType) then
-    TokenType := TTokenType.IDENTIFIER;
+    TokenType := TTokenType.IDENTIFIER_TOKEN;
 
   AddToken(TokenType);
 end;
@@ -200,7 +200,7 @@ begin
     Value := Default(TLoxValue);
     Value.ValueType := TLoxValueType.IS_DOUBLE;
     Value.DoubleValue := StrToFloat(Copy(FSource, FStart, FCurrent - FStart));
-    AddToken(TTokenType.NUMBER, Value);
+    AddToken(TTokenType.NUMBER_LITERAL, Value);
   finally
     FormatSettings.DecimalSeparator := OldDecimalSeparator;
   end;
@@ -233,7 +233,7 @@ begin
   Value := Default(TLoxValue);
   Value.ValueType := TLoxValueType.IS_STRING;
   Value.StrValue := ShortString(Copy(FSource, FStart + 1, FCurrent - FStart - 2));
-  AddToken(TTokenType.&STRING, Value);
+  AddToken(TTokenType.STRING_LITERAL, Value);
 end;
 
 function TScanner.Peek(): Char;
@@ -284,7 +284,7 @@ begin
   end;
 
   NullValue.ValueType := TLoxValueType.IS_NULL;
-  FTokens.Add(TToken.Create(TTokenType.EOF, '', NullValue, FLineNro));
+  FTokens.Add(TToken.Create(TTokenType.END_OF_FILE_TOKEN, '', NullValue, FLineNro));
   Result := FTokens;
 
 end;

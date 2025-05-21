@@ -253,47 +253,47 @@ begin
   Right := Evaluate(BinaryExpression.Right);
 
   case BinaryExpression.Operador.TokenType of
-    TTokenType.BANG_EQUAL:
+    TTokenType.NOT_EQUAL_PAIRS_SYMBOL:
       begin
         Result.ValueType := TLoxValueType.IS_BOOLEAN;
         Result.BooleanValue := not IsEqual(left, Right);
       end;
-    TTokenType.EQUAL_EQUAL:
+    TTokenType.EQUAL_EQUAL_PAIRS_SYMBOL:
       begin
         Result.ValueType := TLoxValueType.IS_BOOLEAN;
         Result.BooleanValue := IsEqual(left, Right);
       end;
-    TTokenType.GREATER:
+    TTokenType.GREATER_SYMBOL:
       begin
         CheckNumberOperands(BinaryExpression.Operador, left, Right);
         Result.ValueType := TLoxValueType.IS_BOOLEAN;
         Result.BooleanValue := left.DoubleValue > Right.DoubleValue;
       end;
-    TTokenType.GREATER_EQUAL:
+    TTokenType.GREATER_EQUAL_PAIRS_SYMBOL:
       begin
         CheckNumberOperands(BinaryExpression.Operador, left, Right);
         Result.ValueType := TLoxValueType.IS_BOOLEAN;
         Result.BooleanValue := left.DoubleValue >= Right.DoubleValue;
       end;
-    TTokenType.LESS:
+    TTokenType.LESS_SYMBOL:
       begin
         CheckNumberOperands(BinaryExpression.Operador, left, Right);
         Result.ValueType := TLoxValueType.IS_BOOLEAN;
         Result.BooleanValue := left.DoubleValue < Right.DoubleValue;
       end;
-    TTokenType.LESS_EQUAL:
+    TTokenType.LESS_EQUAL_PAIRS_SYMBOL:
       begin
         CheckNumberOperands(BinaryExpression.Operador, left, Right);
         Result.ValueType := TLoxValueType.IS_BOOLEAN;
         Result.BooleanValue := left.DoubleValue <= Right.DoubleValue;
       end;
-    TTokenType.MINUS:
+    TTokenType.MINUS_SYMBOL:
       begin
         CheckNumberOperands(BinaryExpression.Operador, left, Right);
         Result.ValueType := TLoxValueType.IS_DOUBLE;
         Result.DoubleValue := left.DoubleValue - Right.DoubleValue;
       end;
-    TTokenType.PLUS:
+    TTokenType.PLUS_SYMBOL:
       begin
         if (left.ValueType = TLoxValueType.IS_DOUBLE) and
            (Right.ValueType = TLoxValueType.IS_DOUBLE) then
@@ -322,7 +322,7 @@ begin
           raise ERuntimeError.Create(BinaryExpression.Operador,
             'Os operandos devem ter dois números ou duas strings');
       end;
-    TTokenType.SLASH:
+    TTokenType.SLASH_SYMBOL:
       begin
         CheckNumberOperands(BinaryExpression.Operador, left, Right);
 
@@ -332,7 +332,7 @@ begin
         Result.ValueType := TLoxValueType.IS_DOUBLE;
         Result.DoubleValue := left.DoubleValue / Right.DoubleValue;
       end;
-    TTokenType.STAR:
+    TTokenType.STAR_SYMBOL:
       begin
         CheckNumberOperands(BinaryExpression.Operador, left, Right);
         Result.ValueType := TLoxValueType.IS_DOUBLE;
@@ -357,12 +357,12 @@ begin
 
   Right := Evaluate(UnaryExpression.Right);
 
-  if UnaryExpression.Operador.TokenType = TTokenType.BANG then
+  if UnaryExpression.Operador.TokenType = TTokenType.NOT_SYMBOL then
   begin
     Result.ValueType := TLoxValueType.IS_DOUBLE;
     Result.BooleanValue := not IsTruthy(Right);
   end
-  else if UnaryExpression.Operador.TokenType = TTokenType.MINUS then
+  else if UnaryExpression.Operador.TokenType = TTokenType.MINUS_SYMBOL then
   begin
     CheckNumberOperand(UnaryExpression.Operador, Right);
     Result.ValueType := TLoxValueType.IS_DOUBLE;
@@ -640,7 +640,7 @@ var
 begin
   left := Evaluate(LogicalExpression.left);
 
-  if (LogicalExpression.Operador.TokenType = TTokenType.OR) then
+  if (LogicalExpression.Operador.TokenType = TTokenType.OR_KEYWORD) then
   begin
     if IsTruthy(left) then
       Exit(left);

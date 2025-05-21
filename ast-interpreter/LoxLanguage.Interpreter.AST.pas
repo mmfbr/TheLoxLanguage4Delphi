@@ -5,7 +5,7 @@
 // ESSE ARQUIVO É GERADO DE FORMA AUTOMATICA PELO PROGRAMA "GenerateApp.exe"     
 //                                                                               
 // GenerateApp: LoxLanguage.Interpreter.AST.GenerateApp.exe
-// Data: 21/05/2025 06:36:24
+// Data: 21/05/2025 07:20:51
 //                                                                               
 // ******************************************************************************
 
