@@ -23,9 +23,9 @@ type
     procedure Define(const Name: string; Value: TLoxValue);
     function Ancestor(Distance: Integer): TEnvironment;
     function GetAt(Distance: Integer; Name: string): TLoxValue;
-    procedure AssignAt(Distance: Integer; Name: TToken; Value: TLoxValue);
-    function Get(Name: TToken): TLoxValue;
-    procedure Assign(Name: TToken; Value: TLoxValue);
+    procedure AssignAt(Distance: Integer; Name: TLoxToken; Value: TLoxValue);
+    function Get(Name: TLoxToken): TLoxValue;
+    procedure Assign(Name: TLoxToken; Value: TLoxValue);
     property Enclosing: TEnvironment read FEnclosing;
   end;
 
@@ -68,12 +68,12 @@ begin
   Result := Ancestor(distance).FValues[Name];
 end;
 
-procedure TEnvironment.AssignAt(Distance: Integer; Name: TToken; Value: TLoxValue);
+procedure TEnvironment.AssignAt(Distance: Integer; Name: TLoxToken; Value: TLoxValue);
 begin
   Ancestor(distance).FValues[Name.lexeme] := Value;
 end;
 
-function TEnvironment.Get(Name: TToken): TLoxValue;
+function TEnvironment.Get(Name: TLoxToken): TLoxValue;
 begin
 
   if FValues.ContainsKey(Name.Lexeme) then
@@ -81,11 +81,11 @@ begin
   else if not (FEnclosing = nil) then
     Result := FEnclosing.Get(Name)
   else
-    raise ERuntimeError.Create(Name, 'Variável indefinida "' + Name.Lexeme + '".');
+    raise ELoxRuntimeError.Create(Name, 'Variável indefinida "' + Name.Lexeme + '".');
 
 end;
 
-procedure TEnvironment.Assign(Name: TToken; Value: TLoxValue);
+procedure TEnvironment.Assign(Name: TLoxToken; Value: TLoxValue);
 begin
 
   if (FValues.ContainsKey(Name.Lexeme)) then
@@ -93,7 +93,7 @@ begin
   else if Assigned(FEnclosing) then
     FEnclosing.Assign(Name, Value)
   else
-    raise ERuntimeError.Create(Name, 'Variável indefinida "' + name.lexeme + '".');
+    raise ELoxRuntimeError.Create(Name, 'Variável indefinida "' + name.lexeme + '".');
 
 end;
 

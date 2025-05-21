@@ -21,7 +21,7 @@ type
   TScanner = class
   private
     FSource: string;
-    FTokens: TObjectList<TToken>;
+    FTokens: TObjectList<TLoxToken>;
     FStart: Integer;
     FCurrent: Integer;
     FLineNro: Integer;
@@ -29,8 +29,8 @@ type
     function IsAtEnd: Boolean;
     function Advance: Char;
     procedure ScanToken;
-    procedure AddToken(TokenType: TTokenType); overload;
-    procedure AddToken(TokenType: TTokenType; Literal: TLoxValue); overload;
+    procedure AddToken(TokenType: TLoxTokenType); overload;
+    procedure AddToken(TokenType: TLoxTokenType; Literal: TLoxValue); overload;
     procedure Error(Line: Integer; Msg: string);
     function Match(Expected: Char): Boolean;
     function Peek: Char;
@@ -43,7 +43,7 @@ type
     procedure ScanIdentifier;
   public
     constructor Create(Source: string);
-    function ScanTokens: TObjectList<TToken>;
+    function ScanTokens: TObjectList<TLoxToken>;
     destructor Destroy; override;
     property OnError: TOnScannerErrorEvent read FOnError write FOnError;
   end;
@@ -57,7 +57,7 @@ uses
 
 constructor TScanner.Create(Source: string);
 begin
-  FTokens := TObjectList<TToken>.Create();
+  FTokens := TObjectList<TLoxToken>.Create();
   FSource := Source;
   FStart := 1;
   Fcurrent := 1;
@@ -81,7 +81,7 @@ begin
   Result := FSource[FCurrent-1];
 end;
 
-procedure TScanner.AddToken(TokenType: TTokenType);
+procedure TScanner.AddToken(TokenType: TLoxTokenType);
 var
   NullValue: TLoxValue;
 begin
@@ -90,12 +90,12 @@ begin
   AddToken(TokenType, NullValue);
 end;
 
-procedure TScanner.AddToken(TokenType: TTokenType; Literal: TLoxValue);
+procedure TScanner.AddToken(TokenType: TLoxTokenType; Literal: TLoxValue);
 var
   Text: string;
 begin
   Text := Copy(FSource, FStart, FCurrent - FStart);
-  FTokens.Add(TToken.Create(TokenType, Text, Literal, FLineNro));
+  FTokens.Add(TLoxToken.Create(TokenType, Text, Literal, FLineNro));
 end;
 
 procedure TScanner.ScanToken();
@@ -105,20 +105,20 @@ begin
   c := Advance();
 
   case (c) of
-    '(': AddToken(TTokenType.LEFT_PAREN_SYMBOL);
-    ')': AddToken(TTokenType.RIGHT_PAREN_SYMBOL);
-    '{': AddToken(TTokenType.LEFT_BRACE_SYMBOL);
-    '}': AddToken(TTokenType.RIGHT_BRACE_SYMBOL);
-    ',': AddToken(TTokenType.COMMA_SYMBOL);
-    '.': AddToken(TTokenType.DOT_SYMBOL);
-    '-': AddToken(TTokenType.MINUS_SYMBOL);
-    '+': AddToken(TTokenType.PLUS_SYMBOL);
-    ';': AddToken(TTokenType.SEMICOLON_SYMBOL);
-    '*': AddToken(TTokenType.STAR_SYMBOL);
-    '!': AddToken(IfThen(Match('='), TTokenType.NOT_EQUAL_PAIRS_SYMBOL, TTokenType.NOT_SYMBOL));
-    '=': AddToken(IfThen(Match('='), TTokenType.EQUAL_EQUAL_PAIRS_SYMBOL, TTokenType.EQUAL_SYMBOL));
-    '<': AddToken(IfThen(Match('='), TTokenType.LESS_EQUAL_PAIRS_SYMBOL, TTokenType.LESS_SYMBOL));
-    '>': AddToken(IfThen(Match('='), TTokenType.GREATER_EQUAL_PAIRS_SYMBOL, TTokenType.GREATER_SYMBOL));
+    '(': AddToken(TLoxTokenType.LEFT_PAREN_SYMBOL);
+    ')': AddToken(TLoxTokenType.RIGHT_PAREN_SYMBOL);
+    '{': AddToken(TLoxTokenType.LEFT_BRACE_SYMBOL);
+    '}': AddToken(TLoxTokenType.RIGHT_BRACE_SYMBOL);
+    ',': AddToken(TLoxTokenType.COMMA_SYMBOL);
+    '.': AddToken(TLoxTokenType.DOT_SYMBOL);
+    '-': AddToken(TLoxTokenType.MINUS_SYMBOL);
+    '+': AddToken(TLoxTokenType.PLUS_SYMBOL);
+    ';': AddToken(TLoxTokenType.SEMICOLON_SYMBOL);
+    '*': AddToken(TLoxTokenType.STAR_SYMBOL);
+    '!': AddToken(IfThen(Match('='), TLoxTokenType.NOT_EQUAL_PAIRS_SYMBOL, TLoxTokenType.NOT_SYMBOL));
+    '=': AddToken(IfThen(Match('='), TLoxTokenType.EQUAL_EQUAL_PAIRS_SYMBOL, TLoxTokenType.EQUAL_SYMBOL));
+    '<': AddToken(IfThen(Match('='), TLoxTokenType.LESS_EQUAL_PAIRS_SYMBOL, TLoxTokenType.LESS_SYMBOL));
+    '>': AddToken(IfThen(Match('='), TLoxTokenType.GREATER_EQUAL_PAIRS_SYMBOL, TLoxTokenType.GREATER_SYMBOL));
     '/':
     begin
       if (match('/')) then
@@ -128,7 +128,7 @@ begin
           Advance();
       end
       else
-        AddToken(TTokenType.SLASH_SYMBOL);
+        AddToken(TLoxTokenType.SLASH_SYMBOL);
     end;
     ' ', #13, #9: ; // Ignorar espaço em branco, retorno do carro e tabulação.
     #10: Inc(FLineNro); // Nova linha.
@@ -144,7 +144,7 @@ end;
 procedure TScanner.ScanIdentifier();
 var
   Text: string;
-  TokenType: TTokenType;
+  TokenType: TLoxTokenType;
 begin
 
   while (IsAlphaNumeric(Peek())) do
@@ -153,8 +153,8 @@ begin
   // See if the identifier is a reserved word.
   Text := Copy(FSource, FStart, FCurrent - FStart);
 
-  if not Keywords.TryGetValue(Text, TokenType) then
-    TokenType := TTokenType.IDENTIFIER_TOKEN;
+  if not LoxReservedKeywords.TryGetValue(Text, TokenType) then
+    TokenType := TLoxTokenType.IDENTIFIER_TOKEN;
 
   AddToken(TokenType);
 end;
@@ -200,7 +200,7 @@ begin
     Value := Default(TLoxValue);
     Value.ValueType := TLoxValueType.IS_DOUBLE;
     Value.DoubleValue := StrToFloat(Copy(FSource, FStart, FCurrent - FStart));
-    AddToken(TTokenType.NUMBER_LITERAL, Value);
+    AddToken(TLoxTokenType.NUMBER_LITERAL, Value);
   finally
     FormatSettings.DecimalSeparator := OldDecimalSeparator;
   end;
@@ -233,7 +233,7 @@ begin
   Value := Default(TLoxValue);
   Value.ValueType := TLoxValueType.IS_STRING;
   Value.StrValue := ShortString(Copy(FSource, FStart + 1, FCurrent - FStart - 2));
-  AddToken(TTokenType.STRING_LITERAL, Value);
+  AddToken(TLoxTokenType.STRING_LITERAL, Value);
 end;
 
 function TScanner.Peek(): Char;
@@ -271,7 +271,7 @@ begin
     FOnError(Line, Msg);
 end;
 
-function TScanner.ScanTokens: TObjectList<TToken>;
+function TScanner.ScanTokens: TObjectList<TLoxToken>;
 var
   NullValue: TLoxValue;
 begin
@@ -284,7 +284,7 @@ begin
   end;
 
   NullValue.ValueType := TLoxValueType.IS_NULL;
-  FTokens.Add(TToken.Create(TTokenType.END_OF_FILE_TOKEN, '', NullValue, FLineNro));
+  FTokens.Add(TLoxToken.Create(TLoxTokenType.END_OF_FILE_TOKEN, '', NullValue, FLineNro));
   Result := FTokens;
 
 end;

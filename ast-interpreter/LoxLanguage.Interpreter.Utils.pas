@@ -19,7 +19,7 @@ type
     class function ToEnumDef(const Str: string; const Default: T): T;
   end;
 
-function IfThen(AValue: Boolean; const ATrue: TTokenType; const AFalse: TTokenType): TTokenType; overload; inline;
+function IfThen(AValue: Boolean; const ATrue: TLoxTokenType; const AFalse: TLoxTokenType): TLoxTokenType; overload; inline;
 
 implementation
 
@@ -27,7 +27,7 @@ uses
   System.SysUtils,
   System.TypInfo;
 
-function IfThen(AValue: Boolean; const ATrue: TTokenType; const AFalse: TTokenType): TTokenType; overload; inline;
+function IfThen(AValue: Boolean; const ATrue: TLoxTokenType; const AFalse: TLoxTokenType): TLoxTokenType; overload; inline;
 begin
   if AValue then
     Result := ATrue

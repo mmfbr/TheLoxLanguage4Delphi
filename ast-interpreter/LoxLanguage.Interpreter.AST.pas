@@ -2,10 +2,10 @@
 //                                                                               
 //               The Lox Language - Abstract Syntax Tree                         
 //                                                                               
-// ESSE ARQUIVO É GERADO DE FORMA AUTOMATICA PELO PROGRAMA "GenerateApp.exe"     
+// ESSE ARQUIVO É GERADO DE FORMA AUTOMATICA PELO PROGRAMA "GenerateApp"         
 //                                                                               
 // GenerateApp: LoxLanguage.Interpreter.AST.GenerateApp.exe
-// Data: 21/05/2025 07:20:51
+// Data: 21/05/2025 16:53:50
 //                                                                               
 // ******************************************************************************
 
@@ -19,63 +19,63 @@ uses
 
 type
 
-  IVisitor = interface;
+  IAstVisitor = interface;
 
-  TASTNode = class
-    function Accept(Visitor: IVisitor): TLoxValue; virtual; abstract;
+  TAstNode = class
+    function Accept(Visitor: IAstVisitor): TLoxValue; virtual; abstract;
   end;
 
   { TExpressionNode }
 
-  TExpressionNode = class(TASTNode)
+  TExpressionNode = class(TAstNode)
   end;
 
   TAssignExpressionNode = class(TExpressionNode)
   private
-    FName: TToken;
+    FName: TLoxToken;
     FValue: TExpressionNode;
   public
-    constructor Create(Name: TToken; Value: TExpressionNode);
-    function Accept(Visitor: IVisitor): TLoxValue; override; 
-    property Name: TToken read FName write FName;
+    constructor Create(Name: TLoxToken; Value: TExpressionNode);
+    function Accept(Visitor: IAstVisitor): TLoxValue; override; 
+    property Name: TLoxToken read FName write FName;
     property Value: TExpressionNode read FValue write FValue;
   end;
 
   TBinaryExpressionNode = class(TExpressionNode)
   private
     FLeft: TExpressionNode;
-    FOperador: TToken;
+    FOperador: TLoxToken;
     FRight: TExpressionNode;
   public
-    constructor Create(Left: TExpressionNode; Operador: TToken; Right: TExpressionNode);
-    function Accept(Visitor: IVisitor): TLoxValue; override; 
+    constructor Create(Left: TExpressionNode; Operador: TLoxToken; Right: TExpressionNode);
+    function Accept(Visitor: IAstVisitor): TLoxValue; override; 
     property Left: TExpressionNode read FLeft write FLeft;
-    property Operador: TToken read FOperador write FOperador;
+    property Operador: TLoxToken read FOperador write FOperador;
     property Right: TExpressionNode read FRight write FRight;
   end;
 
   TCallExpressionNode = class(TExpressionNode)
   private
     FCallee: TExpressionNode;
-    FParen: TToken;
+    FParen: TLoxToken;
     FArguments: TObjectList<TExpressionNode>;
   public
-    constructor Create(Callee: TExpressionNode; Paren: TToken; Arguments: TObjectList<TExpressionNode>);
-    function Accept(Visitor: IVisitor): TLoxValue; override; 
+    constructor Create(Callee: TExpressionNode; Paren: TLoxToken; Arguments: TObjectList<TExpressionNode>);
+    function Accept(Visitor: IAstVisitor): TLoxValue; override; 
     property Callee: TExpressionNode read FCallee write FCallee;
-    property Paren: TToken read FParen write FParen;
+    property Paren: TLoxToken read FParen write FParen;
     property Arguments: TObjectList<TExpressionNode> read FArguments write FArguments;
   end;
 
   TGetExpressionNode = class(TExpressionNode)
   private
     FObj: TExpressionNode;
-    FName: TToken;
+    FName: TLoxToken;
   public
-    constructor Create(Obj: TExpressionNode; Name: TToken);
-    function Accept(Visitor: IVisitor): TLoxValue; override; 
+    constructor Create(Obj: TExpressionNode; Name: TLoxToken);
+    function Accept(Visitor: IAstVisitor): TLoxValue; override; 
     property Obj: TExpressionNode read FObj write FObj;
-    property Name: TToken read FName write FName;
+    property Name: TLoxToken read FName write FName;
   end;
 
   TGroupingExpressionNode = class(TExpressionNode)
@@ -83,7 +83,7 @@ type
     FExpr: TExpressionNode;
   public
     constructor Create(Expr: TExpressionNode);
-    function Accept(Visitor: IVisitor): TLoxValue; override; 
+    function Accept(Visitor: IAstVisitor): TLoxValue; override; 
     property Expr: TExpressionNode read FExpr write FExpr;
   end;
 
@@ -92,79 +92,79 @@ type
     FValue: TLoxValue;
   public
     constructor Create(Value: TLoxValue);
-    function Accept(Visitor: IVisitor): TLoxValue; override; 
+    function Accept(Visitor: IAstVisitor): TLoxValue; override; 
     property Value: TLoxValue read FValue write FValue;
   end;
 
   TLogicalExpressionNode = class(TExpressionNode)
   private
     FLeft: TExpressionNode;
-    FOperador: TToken;
+    FOperador: TLoxToken;
     FRight: TExpressionNode;
   public
-    constructor Create(Left: TExpressionNode; Operador: TToken; Right: TExpressionNode);
-    function Accept(Visitor: IVisitor): TLoxValue; override; 
+    constructor Create(Left: TExpressionNode; Operador: TLoxToken; Right: TExpressionNode);
+    function Accept(Visitor: IAstVisitor): TLoxValue; override; 
     property Left: TExpressionNode read FLeft write FLeft;
-    property Operador: TToken read FOperador write FOperador;
+    property Operador: TLoxToken read FOperador write FOperador;
     property Right: TExpressionNode read FRight write FRight;
   end;
 
   TSetExpressionNode = class(TExpressionNode)
   private
     FObj: TExpressionNode;
-    FName: TToken;
+    FName: TLoxToken;
     FValue: TExpressionNode;
   public
-    constructor Create(Obj: TExpressionNode; Name: TToken; Value: TExpressionNode);
-    function Accept(Visitor: IVisitor): TLoxValue; override; 
+    constructor Create(Obj: TExpressionNode; Name: TLoxToken; Value: TExpressionNode);
+    function Accept(Visitor: IAstVisitor): TLoxValue; override; 
     property Obj: TExpressionNode read FObj write FObj;
-    property Name: TToken read FName write FName;
+    property Name: TLoxToken read FName write FName;
     property Value: TExpressionNode read FValue write FValue;
   end;
 
   TSuperExpressionNode = class(TExpressionNode)
   private
-    FKeyword: TToken;
-    FMethod: TToken;
+    FKeyword: TLoxToken;
+    FMethod: TLoxToken;
   public
-    constructor Create(Keyword: TToken; Method: TToken);
-    function Accept(Visitor: IVisitor): TLoxValue; override; 
-    property Keyword: TToken read FKeyword write FKeyword;
-    property Method: TToken read FMethod write FMethod;
+    constructor Create(Keyword: TLoxToken; Method: TLoxToken);
+    function Accept(Visitor: IAstVisitor): TLoxValue; override; 
+    property Keyword: TLoxToken read FKeyword write FKeyword;
+    property Method: TLoxToken read FMethod write FMethod;
   end;
 
   TThisExpressionNode = class(TExpressionNode)
   private
-    FKeyword: TToken;
+    FKeyword: TLoxToken;
   public
-    constructor Create(Keyword: TToken);
-    function Accept(Visitor: IVisitor): TLoxValue; override; 
-    property Keyword: TToken read FKeyword write FKeyword;
+    constructor Create(Keyword: TLoxToken);
+    function Accept(Visitor: IAstVisitor): TLoxValue; override; 
+    property Keyword: TLoxToken read FKeyword write FKeyword;
   end;
 
   TUnaryExpressionNode = class(TExpressionNode)
   private
-    FOperador: TToken;
+    FOperador: TLoxToken;
     FRight: TExpressionNode;
   public
-    constructor Create(Operador: TToken; Right: TExpressionNode);
-    function Accept(Visitor: IVisitor): TLoxValue; override; 
-    property Operador: TToken read FOperador write FOperador;
+    constructor Create(Operador: TLoxToken; Right: TExpressionNode);
+    function Accept(Visitor: IAstVisitor): TLoxValue; override; 
+    property Operador: TLoxToken read FOperador write FOperador;
     property Right: TExpressionNode read FRight write FRight;
   end;
 
   TVariableExpressionNode = class(TExpressionNode)
   private
-    FName: TToken;
+    FName: TLoxToken;
   public
-    constructor Create(Name: TToken);
-    function Accept(Visitor: IVisitor): TLoxValue; override; 
-    property Name: TToken read FName write FName;
+    constructor Create(Name: TLoxToken);
+    function Accept(Visitor: IAstVisitor): TLoxValue; override; 
+    property Name: TLoxToken read FName write FName;
   end;
 
   { TStatementNode }
 
-  TStatementNode = class(TASTNode)
+  TStatementNode = class(TAstNode)
   end;
 
   TBlockStatementNode = class(TStatementNode)
@@ -172,7 +172,7 @@ type
     FStatements: TObjectList<TStatementNode>;
   public
     constructor Create(Statements: TObjectList<TStatementNode>);
-    function Accept(Visitor: IVisitor): TLoxValue; override; 
+    function Accept(Visitor: IAstVisitor): TLoxValue; override; 
     property Statements: TObjectList<TStatementNode> read FStatements write FStatements;
   end;
 
@@ -180,14 +180,14 @@ type
   private
   public
     constructor Create();
-    function Accept(Visitor: IVisitor): TLoxValue; override; 
+    function Accept(Visitor: IAstVisitor): TLoxValue; override; 
   end;
 
   TContinueStatementNode = class(TStatementNode)
   private
   public
     constructor Create();
-    function Accept(Visitor: IVisitor): TLoxValue; override; 
+    function Accept(Visitor: IAstVisitor): TLoxValue; override; 
   end;
 
   TExpressionStatementNode = class(TStatementNode)
@@ -195,7 +195,7 @@ type
     FExpression: TExpressionNode;
   public
     constructor Create(Expression: TExpressionNode);
-    function Accept(Visitor: IVisitor): TLoxValue; override; 
+    function Accept(Visitor: IAstVisitor): TLoxValue; override; 
     property Expression: TExpressionNode read FExpression write FExpression;
   end;
 
@@ -206,7 +206,7 @@ type
     FElseBranch: TStatementNode;
   public
     constructor Create(Condition: TExpressionNode; ThenBranch: TStatementNode; ElseBranch: TStatementNode);
-    function Accept(Visitor: IVisitor): TLoxValue; override; 
+    function Accept(Visitor: IAstVisitor): TLoxValue; override; 
     property Condition: TExpressionNode read FCondition write FCondition;
     property ThenBranch: TStatementNode read FThenBranch write FThenBranch;
     property ElseBranch: TStatementNode read FElseBranch write FElseBranch;
@@ -214,14 +214,14 @@ type
 
   TFunctionStatementNode = class(TStatementNode)
   private
-    FName: TToken;
-    FParams: TObjectList<TToken>;
+    FName: TLoxToken;
+    FParams: TObjectList<TLoxToken>;
     FBody: TObjectList<TStatementNode>;
   public
-    constructor Create(Name: TToken; Params: TObjectList<TToken>; Body: TObjectList<TStatementNode>);
-    function Accept(Visitor: IVisitor): TLoxValue; override; 
-    property Name: TToken read FName write FName;
-    property Params: TObjectList<TToken> read FParams write FParams;
+    constructor Create(Name: TLoxToken; Params: TObjectList<TLoxToken>; Body: TObjectList<TStatementNode>);
+    function Accept(Visitor: IAstVisitor): TLoxValue; override; 
+    property Name: TLoxToken read FName write FName;
+    property Params: TObjectList<TLoxToken> read FParams write FParams;
     property Body: TObjectList<TStatementNode> read FBody write FBody;
   end;
 
@@ -230,42 +230,42 @@ type
     FExpr: TExpressionNode;
   public
     constructor Create(Expr: TExpressionNode);
-    function Accept(Visitor: IVisitor): TLoxValue; override; 
+    function Accept(Visitor: IAstVisitor): TLoxValue; override; 
     property Expr: TExpressionNode read FExpr write FExpr;
   end;
 
   TClassStatementNode = class(TStatementNode)
   private
-    FName: TToken;
+    FName: TLoxToken;
     FSuperClass: TVariableExpressionNode;
     FMethods: TObjectList<TFunctionStatementNode>;
   public
-    constructor Create(Name: TToken; SuperClass: TVariableExpressionNode; Methods: TObjectList<TFunctionStatementNode>);
-    function Accept(Visitor: IVisitor): TLoxValue; override; 
-    property Name: TToken read FName write FName;
+    constructor Create(Name: TLoxToken; SuperClass: TVariableExpressionNode; Methods: TObjectList<TFunctionStatementNode>);
+    function Accept(Visitor: IAstVisitor): TLoxValue; override; 
+    property Name: TLoxToken read FName write FName;
     property SuperClass: TVariableExpressionNode read FSuperClass write FSuperClass;
     property Methods: TObjectList<TFunctionStatementNode> read FMethods write FMethods;
   end;
 
   TReturnStatementNode = class(TStatementNode)
   private
-    FKeyword: TToken;
+    FKeyword: TLoxToken;
     FValue: TExpressionNode;
   public
-    constructor Create(Keyword: TToken; Value: TExpressionNode);
-    function Accept(Visitor: IVisitor): TLoxValue; override; 
-    property Keyword: TToken read FKeyword write FKeyword;
+    constructor Create(Keyword: TLoxToken; Value: TExpressionNode);
+    function Accept(Visitor: IAstVisitor): TLoxValue; override; 
+    property Keyword: TLoxToken read FKeyword write FKeyword;
     property Value: TExpressionNode read FValue write FValue;
   end;
 
   TVarStatementNode = class(TStatementNode)
   private
-    FName: TToken;
+    FName: TLoxToken;
     FInitializer: TExpressionNode;
   public
-    constructor Create(Name: TToken; Initializer: TExpressionNode);
-    function Accept(Visitor: IVisitor): TLoxValue; override; 
-    property Name: TToken read FName write FName;
+    constructor Create(Name: TLoxToken; Initializer: TExpressionNode);
+    function Accept(Visitor: IAstVisitor): TLoxValue; override; 
+    property Name: TLoxToken read FName write FName;
     property Initializer: TExpressionNode read FInitializer write FInitializer;
   end;
 
@@ -275,12 +275,12 @@ type
     FBody: TStatementNode;
   public
     constructor Create(Condition: TExpressionNode; Body: TStatementNode);
-    function Accept(Visitor: IVisitor): TLoxValue; override; 
+    function Accept(Visitor: IAstVisitor): TLoxValue; override; 
     property Condition: TExpressionNode read FCondition write FCondition;
     property Body: TStatementNode read FBody write FBody;
   end;
 
-  IVisitor = interface
+  IAstVisitor = interface
   ['{E92FFE0B-F01A-4F30-BF88-0C866382851F}']
     function Visit(AssignExpressionNode: TAssignExpressionNode): TLoxValue; overload;
     function Visit(BinaryExpressionNode: TBinaryExpressionNode): TLoxValue; overload;
@@ -311,48 +311,48 @@ implementation
 
   { TExpressionNode }
 
-constructor TAssignExpressionNode.Create(Name: TToken; Value: TExpressionNode);
+constructor TAssignExpressionNode.Create(Name: TLoxToken; Value: TExpressionNode);
 begin
   FName := Name;
   FValue := Value;
 end;
 
-function TAssignExpressionNode.Accept(Visitor: IVisitor): TLoxValue; 
+function TAssignExpressionNode.Accept(Visitor: IAstVisitor): TLoxValue; 
 begin
   Result := Visitor.Visit(Self);
 end;
 
-constructor TBinaryExpressionNode.Create(Left: TExpressionNode; Operador: TToken; Right: TExpressionNode);
+constructor TBinaryExpressionNode.Create(Left: TExpressionNode; Operador: TLoxToken; Right: TExpressionNode);
 begin
   FLeft := Left;
   FOperador := Operador;
   FRight := Right;
 end;
 
-function TBinaryExpressionNode.Accept(Visitor: IVisitor): TLoxValue; 
+function TBinaryExpressionNode.Accept(Visitor: IAstVisitor): TLoxValue; 
 begin
   Result := Visitor.Visit(Self);
 end;
 
-constructor TCallExpressionNode.Create(Callee: TExpressionNode; Paren: TToken; Arguments: TObjectList<TExpressionNode>);
+constructor TCallExpressionNode.Create(Callee: TExpressionNode; Paren: TLoxToken; Arguments: TObjectList<TExpressionNode>);
 begin
   FCallee := Callee;
   FParen := Paren;
   FArguments := Arguments;
 end;
 
-function TCallExpressionNode.Accept(Visitor: IVisitor): TLoxValue; 
+function TCallExpressionNode.Accept(Visitor: IAstVisitor): TLoxValue; 
 begin
   Result := Visitor.Visit(Self);
 end;
 
-constructor TGetExpressionNode.Create(Obj: TExpressionNode; Name: TToken);
+constructor TGetExpressionNode.Create(Obj: TExpressionNode; Name: TLoxToken);
 begin
   FObj := Obj;
   FName := Name;
 end;
 
-function TGetExpressionNode.Accept(Visitor: IVisitor): TLoxValue; 
+function TGetExpressionNode.Accept(Visitor: IAstVisitor): TLoxValue; 
 begin
   Result := Visitor.Visit(Self);
 end;
@@ -362,7 +362,7 @@ begin
   FExpr := Expr;
 end;
 
-function TGroupingExpressionNode.Accept(Visitor: IVisitor): TLoxValue; 
+function TGroupingExpressionNode.Accept(Visitor: IAstVisitor): TLoxValue; 
 begin
   Result := Visitor.Visit(Self);
 end;
@@ -372,73 +372,73 @@ begin
   FValue := Value;
 end;
 
-function TLiteralExpressionNode.Accept(Visitor: IVisitor): TLoxValue; 
+function TLiteralExpressionNode.Accept(Visitor: IAstVisitor): TLoxValue; 
 begin
   Result := Visitor.Visit(Self);
 end;
 
-constructor TLogicalExpressionNode.Create(Left: TExpressionNode; Operador: TToken; Right: TExpressionNode);
+constructor TLogicalExpressionNode.Create(Left: TExpressionNode; Operador: TLoxToken; Right: TExpressionNode);
 begin
   FLeft := Left;
   FOperador := Operador;
   FRight := Right;
 end;
 
-function TLogicalExpressionNode.Accept(Visitor: IVisitor): TLoxValue; 
+function TLogicalExpressionNode.Accept(Visitor: IAstVisitor): TLoxValue; 
 begin
   Result := Visitor.Visit(Self);
 end;
 
-constructor TSetExpressionNode.Create(Obj: TExpressionNode; Name: TToken; Value: TExpressionNode);
+constructor TSetExpressionNode.Create(Obj: TExpressionNode; Name: TLoxToken; Value: TExpressionNode);
 begin
   FObj := Obj;
   FName := Name;
   FValue := Value;
 end;
 
-function TSetExpressionNode.Accept(Visitor: IVisitor): TLoxValue; 
+function TSetExpressionNode.Accept(Visitor: IAstVisitor): TLoxValue; 
 begin
   Result := Visitor.Visit(Self);
 end;
 
-constructor TSuperExpressionNode.Create(Keyword: TToken; Method: TToken);
+constructor TSuperExpressionNode.Create(Keyword: TLoxToken; Method: TLoxToken);
 begin
   FKeyword := Keyword;
   FMethod := Method;
 end;
 
-function TSuperExpressionNode.Accept(Visitor: IVisitor): TLoxValue; 
+function TSuperExpressionNode.Accept(Visitor: IAstVisitor): TLoxValue; 
 begin
   Result := Visitor.Visit(Self);
 end;
 
-constructor TThisExpressionNode.Create(Keyword: TToken);
+constructor TThisExpressionNode.Create(Keyword: TLoxToken);
 begin
   FKeyword := Keyword;
 end;
 
-function TThisExpressionNode.Accept(Visitor: IVisitor): TLoxValue; 
+function TThisExpressionNode.Accept(Visitor: IAstVisitor): TLoxValue; 
 begin
   Result := Visitor.Visit(Self);
 end;
 
-constructor TUnaryExpressionNode.Create(Operador: TToken; Right: TExpressionNode);
+constructor TUnaryExpressionNode.Create(Operador: TLoxToken; Right: TExpressionNode);
 begin
   FOperador := Operador;
   FRight := Right;
 end;
 
-function TUnaryExpressionNode.Accept(Visitor: IVisitor): TLoxValue; 
+function TUnaryExpressionNode.Accept(Visitor: IAstVisitor): TLoxValue; 
 begin
   Result := Visitor.Visit(Self);
 end;
 
-constructor TVariableExpressionNode.Create(Name: TToken);
+constructor TVariableExpressionNode.Create(Name: TLoxToken);
 begin
   FName := Name;
 end;
 
-function TVariableExpressionNode.Accept(Visitor: IVisitor): TLoxValue; 
+function TVariableExpressionNode.Accept(Visitor: IAstVisitor): TLoxValue; 
 begin
   Result := Visitor.Visit(Self);
 end;
@@ -450,7 +450,7 @@ begin
   FStatements := Statements;
 end;
 
-function TBlockStatementNode.Accept(Visitor: IVisitor): TLoxValue; 
+function TBlockStatementNode.Accept(Visitor: IAstVisitor): TLoxValue; 
 begin
   Result := Visitor.Visit(Self);
 end;
@@ -459,7 +459,7 @@ constructor TBreakStatementNode.Create();
 begin
 end;
 
-function TBreakStatementNode.Accept(Visitor: IVisitor): TLoxValue; 
+function TBreakStatementNode.Accept(Visitor: IAstVisitor): TLoxValue; 
 begin
   Result := Visitor.Visit(Self);
 end;
@@ -468,7 +468,7 @@ constructor TContinueStatementNode.Create();
 begin
 end;
 
-function TContinueStatementNode.Accept(Visitor: IVisitor): TLoxValue; 
+function TContinueStatementNode.Accept(Visitor: IAstVisitor): TLoxValue; 
 begin
   Result := Visitor.Visit(Self);
 end;
@@ -478,7 +478,7 @@ begin
   FExpression := Expression;
 end;
 
-function TExpressionStatementNode.Accept(Visitor: IVisitor): TLoxValue; 
+function TExpressionStatementNode.Accept(Visitor: IAstVisitor): TLoxValue; 
 begin
   Result := Visitor.Visit(Self);
 end;
@@ -490,19 +490,19 @@ begin
   FElseBranch := ElseBranch;
 end;
 
-function TIfStatementNode.Accept(Visitor: IVisitor): TLoxValue; 
+function TIfStatementNode.Accept(Visitor: IAstVisitor): TLoxValue; 
 begin
   Result := Visitor.Visit(Self);
 end;
 
-constructor TFunctionStatementNode.Create(Name: TToken; Params: TObjectList<TToken>; Body: TObjectList<TStatementNode>);
+constructor TFunctionStatementNode.Create(Name: TLoxToken; Params: TObjectList<TLoxToken>; Body: TObjectList<TStatementNode>);
 begin
   FName := Name;
   FParams := Params;
   FBody := Body;
 end;
 
-function TFunctionStatementNode.Accept(Visitor: IVisitor): TLoxValue; 
+function TFunctionStatementNode.Accept(Visitor: IAstVisitor): TLoxValue; 
 begin
   Result := Visitor.Visit(Self);
 end;
@@ -512,41 +512,41 @@ begin
   FExpr := Expr;
 end;
 
-function TPrintStatementNode.Accept(Visitor: IVisitor): TLoxValue; 
+function TPrintStatementNode.Accept(Visitor: IAstVisitor): TLoxValue; 
 begin
   Result := Visitor.Visit(Self);
 end;
 
-constructor TClassStatementNode.Create(Name: TToken; SuperClass: TVariableExpressionNode; Methods: TObjectList<TFunctionStatementNode>);
+constructor TClassStatementNode.Create(Name: TLoxToken; SuperClass: TVariableExpressionNode; Methods: TObjectList<TFunctionStatementNode>);
 begin
   FName := Name;
   FSuperClass := SuperClass;
   FMethods := Methods;
 end;
 
-function TClassStatementNode.Accept(Visitor: IVisitor): TLoxValue; 
+function TClassStatementNode.Accept(Visitor: IAstVisitor): TLoxValue; 
 begin
   Result := Visitor.Visit(Self);
 end;
 
-constructor TReturnStatementNode.Create(Keyword: TToken; Value: TExpressionNode);
+constructor TReturnStatementNode.Create(Keyword: TLoxToken; Value: TExpressionNode);
 begin
   FKeyword := Keyword;
   FValue := Value;
 end;
 
-function TReturnStatementNode.Accept(Visitor: IVisitor): TLoxValue; 
+function TReturnStatementNode.Accept(Visitor: IAstVisitor): TLoxValue; 
 begin
   Result := Visitor.Visit(Self);
 end;
 
-constructor TVarStatementNode.Create(Name: TToken; Initializer: TExpressionNode);
+constructor TVarStatementNode.Create(Name: TLoxToken; Initializer: TExpressionNode);
 begin
   FName := Name;
   FInitializer := Initializer;
 end;
 
-function TVarStatementNode.Accept(Visitor: IVisitor): TLoxValue; 
+function TVarStatementNode.Accept(Visitor: IAstVisitor): TLoxValue; 
 begin
   Result := Visitor.Visit(Self);
 end;
@@ -557,7 +557,7 @@ begin
   FBody := Body;
 end;
 
-function TWhileStatementNode.Accept(Visitor: IVisitor): TLoxValue; 
+function TWhileStatementNode.Accept(Visitor: IAstVisitor): TLoxValue; 
 begin
   Result := Visitor.Visit(Self);
 end;

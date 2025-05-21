@@ -13,7 +13,7 @@ uses
 
 type
 
-  TOnParserErrorEvent = procedure(Token: TToken; Msg: string) of object;
+  TOnParserErrorEvent = procedure(Token: TLoxToken; Msg: string) of object;
 
   EParseError = class(Exception)
   end;
@@ -22,7 +22,7 @@ type
   private
     FLoopDepth: Integer;
     FOnError: TOnParserErrorEvent;
-    FTokens: TObjectList<TToken>;
+    FTokens: TObjectList<TLoxToken>;
     FCurrent: Integer;
     function ProcessExpression(): TExpressionNode;
     function ProcessAssignmentExpression(): TExpressionNode;
@@ -35,17 +35,17 @@ type
     function ProcessMultiplicationExpression(): TExpressionNode;
     function ProcessEqualityExpression(): TExpressionNode;
     function ProcessPrimaryExpression(): TExpressionNode;
-    function MatchToken(TokenType: TTokenType): Boolean; overload;
-    function MatchTokens(TokenTypeA, TokenTypeB: TTokenType): Boolean; overload;
-    function MatchTokens(TokenTypes: array of TTokenType): Boolean; overload;
-    function CheckToken(TokenType: TTokenType): Boolean;
-    function ConsumeToken(TokenType: TTokenType; Msg: string): TToken;
-    function Error(Token: TToken; Msg: string): EParseError;
+    function MatchToken(TokenType: TLoxTokenType): Boolean; overload;
+    function MatchTokens(TokenTypeA, TokenTypeB: TLoxTokenType): Boolean; overload;
+    function MatchTokens(TokenTypes: array of TLoxTokenType): Boolean; overload;
+    function CheckToken(TokenType: TLoxTokenType): Boolean;
+    function ConsumeToken(TokenType: TLoxTokenType; Msg: string): TLoxToken;
+    function Error(Token: TLoxToken; Msg: string): EParseError;
     function ProcessComparisonExpression(): TExpressionNode;
-    function AdvanceToken(): TToken;
-    function PreviousToken(): TToken;
+    function AdvanceToken(): TLoxToken;
+    function PreviousToken(): TLoxToken;
     function IsAtEnd(): Boolean;
-    function PeekToken(): TToken;
+    function PeekToken(): TLoxToken;
     procedure Synchronize();
     function ProcessStatement(): TStatementNode;
     function ProcessBreakStatements(): TStatementNode;
@@ -63,7 +63,7 @@ type
     function ProcessBlockStatements(): TObjectList<TStatementNode>;
     function ProcessPrintStatement(): TStatementNode;
   public
-    constructor Create(Tokens: TObjectList<TToken>);
+    constructor Create(Tokens: TObjectList<TLoxToken>);
     function Parse(): TObjectList<TStatementNode>;
     property OnError: TOnParserErrorEvent read FOnError write FOnError;
   end;
@@ -72,7 +72,7 @@ implementation
 
 { TParser }
 
-constructor TParser.Create(Tokens: TObjectList<TToken>);
+constructor TParser.Create(Tokens: TObjectList<TLoxToken>);
 begin
   FLoopDepth := 0;
   FCurrent := 0;
@@ -88,13 +88,13 @@ function TParser.ProcessAssignmentExpression(): TExpressionNode;
 var
   Expr: TExpressionNode;
   Get: TGetExpressionNode;
-  Equals: TToken;
+  Equals: TLoxToken;
   Value: TExpressionNode;
-  Name: TToken;
+  Name: TLoxToken;
 begin
   Expr := ProcessLogicalOrExpression();
 
-  if MatchToken(TTokenType.EQUAL_SYMBOL) then
+  if MatchToken(TLoxTokenType.EQUAL_SYMBOL) then
   begin
     Equals := PreviousToken();
     Value := ProcessAssignmentExpression();
@@ -120,11 +120,11 @@ function TParser.ProcessLogicalOrExpression(): TExpressionNode;
 var
   Expr,
   Right: TExpressionNode;
-  Oper: TToken;
+  Oper: TLoxToken;
 begin
   Expr := ProcessLogicalAndExpression();
 
-  while MatchToken(TTokenType.OR_KEYWORD) do
+  while MatchToken(TLoxTokenType.OR_KEYWORD) do
   begin
     Oper := PreviousToken();
     Right := ProcessLogicalAndExpression();
@@ -138,11 +138,11 @@ function TParser.ProcessLogicalAndExpression(): TExpressionNode;
 var
   Expr,
   Right: TExpressionNode;
-  Oper: TToken;
+  Oper: TLoxToken;
 begin
   Expr := ProcessEqualityExpression();
 
-  while MatchToken(TTokenType.AND_KEYWORD) do
+  while MatchToken(TLoxTokenType.AND_KEYWORD) do
   begin
     Oper := PreviousToken();
     Right := ProcessEqualityExpression();
@@ -155,10 +155,10 @@ end;
 function TParser.ProcessUnaryExpression(): TExpressionNode;
 var
   Right: TExpressionNode;
-  Oper: TToken;
+  Oper: TLoxToken;
 begin
 
-  if MatchTokens([TTokenType.NOT_SYMBOL, TTokenType.MINUS_SYMBOL]) then
+  if MatchTokens([TLoxTokenType.NOT_SYMBOL, TLoxTokenType.MINUS_SYMBOL]) then
   begin
     Oper := PreviousToken();
     Right := ProcessUnaryExpression();
@@ -171,17 +171,17 @@ end;
 function TParser.ProcessCallExpression(): TExpressionNode;
 var
   Expr: TExpressionNode;
-  Name: TToken;
+  Name: TLoxToken;
 begin
   Expr := ProcessPrimaryExpression();
 
   while True do
   begin
-    if MatchToken(TTokenType.LEFT_PAREN_SYMBOL) then
+    if MatchToken(TLoxTokenType.LEFT_PAREN_SYMBOL) then
       Expr := ProcessFinishCallExpression(Expr)
-    else if MatchToken(TTokenType.DOT_SYMBOL) then
+    else if MatchToken(TLoxTokenType.DOT_SYMBOL) then
     begin
-      Name := ConsumeToken(TTokenType.IDENTIFIER_TOKEN, 'Espere o nome da propriedade depois "."');
+      Name := ConsumeToken(TLoxTokenType.IDENTIFIER_TOKEN, 'Espere o nome da propriedade depois "."');
       Expr := TGetExpressionNode.Create(Expr, Name);
     end
     else
@@ -194,21 +194,21 @@ end;
 function TParser.ProcessFinishCallExpression(Callee: TExpressionNode): TExpressionNode;
 var
   Arguments: TObjectList<TExpressionNode>;
-  Paren: TToken;
+  Paren: TLoxToken;
 begin
   Arguments := TObjectList<TExpressionNode>.Create();
 
-  if not CheckToken(TTokenType.RIGHT_PAREN_SYMBOL) then
+  if not CheckToken(TLoxTokenType.RIGHT_PAREN_SYMBOL) then
   begin
     repeat
       if (Arguments.Count >= 255) then
         Error(PeekToken(), 'Não pode ter mais de 255 argumentos.');
 
       Arguments.Add(ProcessExpression());
-    until not MatchToken(TTokenType.COMMA_SYMBOL);
+    until not MatchToken(TLoxTokenType.COMMA_SYMBOL);
   end;
 
-  Paren := ConsumeToken(TTokenType.RIGHT_PAREN_SYMBOL, 'Esperado ")" após argumentos.');
+  Paren := ConsumeToken(TLoxTokenType.RIGHT_PAREN_SYMBOL, 'Esperado ")" após argumentos.');
 
   Result := TCallExpressionNode.Create(Callee, Paren, Arguments);
 end;
@@ -218,10 +218,10 @@ var
   Expr: TExpressionNode;
   Value: TLoxValue;
   Keyword,
-  Method: TToken;
+  Method: TLoxToken;
 begin
 
-  if (MatchToken(TTokenType.FALSE_KEYWORD)) then
+  if (MatchToken(TLoxTokenType.FALSE_KEYWORD)) then
   begin
     Value.ValueType := TLoxValueType.IS_BOOLEAN;
     Value.BooleanValue := False;
@@ -229,7 +229,7 @@ begin
     Exit();
   end;
 
-  if (MatchToken(TTokenType.TRUE_KEYWORD)) then
+  if (MatchToken(TLoxTokenType.TRUE_KEYWORD)) then
   begin
     Value.ValueType := TLoxValueType.IS_BOOLEAN;
     Value.BooleanValue := True;
@@ -237,51 +237,51 @@ begin
     Exit();
   end;
 
-  if MatchToken(TTokenType.NIL_KEYWORD) then
+  if MatchToken(TLoxTokenType.NIL_KEYWORD) then
   begin
     Value.ValueType := TLoxValueType.IS_NULL;
     Result := TLiteralExpressionNode.Create(Value);
     Exit();
   end;
 
-  if MatchTokens(TTokenType.NUMBER_LITERAL, TTokenType.STRING_LITERAL) then
+  if MatchTokens(TLoxTokenType.NUMBER_LITERAL, TLoxTokenType.STRING_LITERAL) then
   begin
     Result := TLiteralExpressionNode.Create(PreviousToken().Literal);
     Exit();
   end;
 
-  if MatchToken(TTokenType.SUPER_KEYWORD) then
+  if MatchToken(TLoxTokenType.SUPER_KEYWORD) then
   begin
     Keyword := PreviousToken();
-    ConsumeToken(TTokenType.DOT_SYMBOL, 'Esperado "." depois de "super".');
-    Method := ConsumeToken(TTokenType.IDENTIFIER_TOKEN, 'Espere o nome do método da superclasse.');
+    ConsumeToken(TLoxTokenType.DOT_SYMBOL, 'Esperado "." depois de "super".');
+    Method := ConsumeToken(TLoxTokenType.IDENTIFIER_TOKEN, 'Espere o nome do método da superclasse.');
     Result := TSuperExpressionNode.Create(Keyword, Method);
     Exit();
   end;
 
-  if MatchToken(TTokenType.THIS_KEYWORD) then
+  if MatchToken(TLoxTokenType.THIS_KEYWORD) then
   begin
     Result := TThisExpressionNode.Create(PreviousToken());
     Exit();
   end;
 
-  if MatchToken(TTokenType.IDENTIFIER_TOKEN) then
+  if MatchToken(TLoxTokenType.IDENTIFIER_TOKEN) then
   begin
     Result := TVariableExpressionNode.Create(PreviousToken());
     Exit();
   end;
 
-  if (MatchToken(TTokenType.LEFT_PAREN_SYMBOL)) then
+  if (MatchToken(TLoxTokenType.LEFT_PAREN_SYMBOL)) then
   begin
     Expr := ProcessExpression();
-    ConsumeToken(TTokenType.RIGHT_PAREN_SYMBOL, 'Esperado um ")" após a expressão.');
+    ConsumeToken(TLoxTokenType.RIGHT_PAREN_SYMBOL, 'Esperado um ")" após a expressão.');
     Exit(TGroupingExpressionNode.Create(Expr));
   end;
 
   raise Error(PeekToken(), 'Esperado expressão.');
 end;
 
-function TParser.ConsumeToken(TokenType: TTokenType; Msg: string): TToken;
+function TParser.ConsumeToken(TokenType: TLoxTokenType; Msg: string): TLoxToken;
 begin
   if (CheckToken(TokenType)) then
     Exit(AdvanceToken());
@@ -294,12 +294,12 @@ begin
   if (FLoopDepth = 0) then
     Error(PreviousToken(), 'Cannot use "continue" outside of a loop.');
 
-  ConsumeToken(TTokenType.SEMICOLON_SYMBOL, 'Expect ";" after continue.');
+  ConsumeToken(TLoxTokenType.SEMICOLON_SYMBOL, 'Expect ";" after continue.');
 
   Result := TContinueStatementNode.Create();
 end;
 
-function TParser.Error(Token: TToken; Msg: string): EParseError;
+function TParser.Error(Token: TLoxToken; Msg: string): EParseError;
 begin
   if Assigned(OnError) then
     OnError(Token, Msg);
@@ -311,11 +311,11 @@ function TParser.ProcessAdditionExpression(): TExpressionNode;
 var
   Expr,
   Right: TExpressionNode;
-  Oper: TToken;
+  Oper: TLoxToken;
 begin
   Expr := ProcessMultiplicationExpression();
 
-  while (MatchTokens([TTokenType.MINUS_SYMBOL, TTokenType.PLUS_SYMBOL])) do
+  while (MatchTokens([TLoxTokenType.MINUS_SYMBOL, TLoxTokenType.PLUS_SYMBOL])) do
   begin
     Oper := PreviousToken();
     Right := ProcessMultiplicationExpression();
@@ -329,11 +329,11 @@ function TParser.ProcessMultiplicationExpression(): TExpressionNode;
 var
   Expr,
   Right: TExpressionNode;
-  Oper: TToken;
+  Oper: TLoxToken;
 begin
     expr := ProcessUnaryExpression();
 
-    while (MatchTokens(TTokenType.SLASH_SYMBOL, TTokenType.STAR_SYMBOL)) do
+    while (MatchTokens(TLoxTokenType.SLASH_SYMBOL, TLoxTokenType.STAR_SYMBOL)) do
     begin
       Oper := PreviousToken();
       right := ProcessUnaryExpression();
@@ -347,11 +347,11 @@ function TParser.ProcessComparisonExpression(): TExpressionNode;
 var
   Expr,
   Right: TExpressionNode;
-  Oper: TToken;
+  Oper: TLoxToken;
 begin
   Expr := ProcessAdditionExpression();
 
-  while (MatchTokens([TTokenType.GREATER_SYMBOL, TTokenType.GREATER_EQUAL_PAIRS_SYMBOL, TTokenType.LESS_SYMBOL, TTokenType.LESS_EQUAL_PAIRS_SYMBOL])) do
+  while (MatchTokens([TLoxTokenType.GREATER_SYMBOL, TLoxTokenType.GREATER_EQUAL_PAIRS_SYMBOL, TLoxTokenType.LESS_SYMBOL, TLoxTokenType.LESS_EQUAL_PAIRS_SYMBOL])) do
   begin
     Oper := PreviousToken();
     Right := ProcessAdditionExpression();
@@ -363,15 +363,15 @@ end;
 
 function TParser.IsAtEnd(): Boolean;
 begin
-  Result := PeekToken().TokenType = TTokenType.END_OF_FILE_TOKEN;
+  Result := PeekToken().TokenType = TLoxTokenType.END_OF_FILE_TOKEN;
 end;
 
-function TParser.PeekToken(): TToken;
+function TParser.PeekToken(): TLoxToken;
 begin
   Result := FTokens[FCurrent];
 end;
 
-function TParser.PreviousToken(): TToken;
+function TParser.PreviousToken(): TLoxToken;
 begin
   Result := FTokens[FCurrent - 1];
 end;
@@ -380,11 +380,11 @@ function TParser.ProcessEqualityExpression(): TExpressionNode;
 var
   Expr,
   Right: TExpressionNode;
-  Oper: TToken;
+  Oper: TLoxToken;
 begin
   Expr := ProcessComparisonExpression();
 
-  while (MatchTokens(TTokenType.NOT_EQUAL_PAIRS_SYMBOL, TTokenType.EQUAL_EQUAL_PAIRS_SYMBOL)) do
+  while (MatchTokens(TLoxTokenType.NOT_EQUAL_PAIRS_SYMBOL, TLoxTokenType.EQUAL_EQUAL_PAIRS_SYMBOL)) do
   begin
     Oper := PreviousToken();
     Right := ProcessComparisonExpression();
@@ -394,7 +394,7 @@ begin
   Result := Expr;
 end;
 
-function TParser.CheckToken(TokenType: TTokenType): Boolean;
+function TParser.CheckToken(TokenType: TLoxTokenType): Boolean;
 begin
   if (IsAtEnd()) then
     Exit(False);
@@ -402,9 +402,9 @@ begin
   Result := PeekToken().TokenType = TokenType;
 end;
 
-function TParser.MatchTokens(TokenTypes: array of TTokenType): Boolean;
+function TParser.MatchTokens(TokenTypes: array of TLoxTokenType): Boolean;
 var
-  TokenType: TTokenType;
+  TokenType: TLoxTokenType;
 begin
 
   for TokenType in TokenTypes do
@@ -419,17 +419,17 @@ begin
   Result := False;
 end;
 
-function TParser.MatchToken(TokenType: TTokenType): Boolean;
+function TParser.MatchToken(TokenType: TLoxTokenType): Boolean;
 begin
   Result := MatchTokens([TokenType]);
 end;
 
-function TParser.MatchTokens(TokenTypeA, TokenTypeB: TTokenType): Boolean;
+function TParser.MatchTokens(TokenTypeA, TokenTypeB: TLoxTokenType): Boolean;
 begin
   Result := MatchTokens([TokenTypeA, TokenTypeB]);
 end;
 
-function TParser.AdvanceToken(): TToken;
+function TParser.AdvanceToken(): TLoxToken;
 begin
   if not isAtEnd() then
     Inc(FCurrent);
@@ -443,18 +443,18 @@ begin
 
   while not isAtEnd() do
   begin
-    if (PreviousToken().TokenType = TTokenType.SEMICOLON_SYMBOL) then
+    if (PreviousToken().TokenType = TLoxTokenType.SEMICOLON_SYMBOL) then
       Exit();
 
     case PeekToken().TokenType of
-      TTokenType.CLASS_KEYWORD,
-      TTokenType.FUN_KEYWORD,
-      TTokenType.VAR_KEYWORD,
-      TTokenType.FOR_KEYWORD,
-      TTokenType.IF_KEYWORD,
-      TTokenType.WHILE_KEYWORD,
-      TTokenType.PRINT_KEYWORD,
-      TTokenType.RETURN_KEYWORD: Exit();
+      TLoxTokenType.CLASS_KEYWORD,
+      TLoxTokenType.FUN_KEYWORD,
+      TLoxTokenType.VAR_KEYWORD,
+      TLoxTokenType.FOR_KEYWORD,
+      TLoxTokenType.IF_KEYWORD,
+      TLoxTokenType.WHILE_KEYWORD,
+      TLoxTokenType.PRINT_KEYWORD,
+      TLoxTokenType.RETURN_KEYWORD: Exit();
     end;
 
     AdvanceToken();
@@ -476,23 +476,23 @@ end;
 
 function TParser.ProcessStatement(): TStatementNode;
 begin
-  if MatchToken(TTokenType.FOR_KEYWORD) then
+  if MatchToken(TLoxTokenType.FOR_KEYWORD) then
     Result := ProcessForStatement()
-  else if MatchToken(TTokenType.BREAK_KEYWORD) then
+  else if MatchToken(TLoxTokenType.BREAK_KEYWORD) then
     Result := ProcessBreakStatements()
-  else if MatchToken(TTokenType.CONTINUE_KEYWORD) then
+  else if MatchToken(TLoxTokenType.CONTINUE_KEYWORD) then
     Result := ProcessContinueStatement()
-  else if MatchToken(TTokenType.DO_KEYWORD) then
+  else if MatchToken(TLoxTokenType.DO_KEYWORD) then
     Result := ProcessDoStatement()
-  else if MatchToken(TTokenType.IF_KEYWORD) then
+  else if MatchToken(TLoxTokenType.IF_KEYWORD) then
     Result := ProcessIfStatement()
-  else if MatchToken(TTokenType.PRINT_KEYWORD) then
+  else if MatchToken(TLoxTokenType.PRINT_KEYWORD) then
     Result := ProcessPrintStatement()
-  else if MatchToken(TTokenType.RETURN_KEYWORD) then
+  else if MatchToken(TLoxTokenType.RETURN_KEYWORD) then
     Result := ProcessReturnStatement()
-  else if MatchToken(TTokenType.WHILE_KEYWORD) then
+  else if MatchToken(TLoxTokenType.WHILE_KEYWORD) then
     Result := ProcessWhileStatement()
-  else if MatchToken(TTokenType.LEFT_BRACE_SYMBOL) then
+  else if MatchToken(TLoxTokenType.LEFT_BRACE_SYMBOL) then
     Result := TBlockStatementNode.Create(ProcessBlockStatements())
   else
     Result := ProcessExpressionStatements();
@@ -503,23 +503,23 @@ begin
   if (FLoopDepth = 0) then
     Error(PreviousToken(), 'Cannot use "continue" outside of a loop.');
 
-  ConsumeToken(TTokenType.SEMICOLON_SYMBOL, 'Expect ";" after break.');
+  ConsumeToken(TLoxTokenType.SEMICOLON_SYMBOL, 'Expect ";" after break.');
 
   Result := TBreakStatementNode.Create();
 end;
 
 function TParser.ProcessReturnStatement(): TStatementNode;
 var
-  Keyword: TToken;
+  Keyword: TLoxToken;
   Value: TExpressionNode;
 begin
   Keyword := PreviousToken();
   Value := nil;
 
-  if not CheckToken(TTokenType.SEMICOLON_SYMBOL) then
+  if not CheckToken(TLoxTokenType.SEMICOLON_SYMBOL) then
     Value := ProcessExpression();
 
-  ConsumeToken(TTokenType.SEMICOLON_SYMBOL, 'Esperado ";" após o valor de retorno.');
+  ConsumeToken(TLoxTokenType.SEMICOLON_SYMBOL, 'Esperado ";" após o valor de retorno.');
   Result := TReturnStatementNode.Create(Keyword, Value);
 end;
 
@@ -535,28 +535,28 @@ begin
 
   Inc(FLoopDepth);
   try
-    ConsumeToken(TTokenType.LEFT_PAREN_SYMBOL, 'Esperado "(" depois de "for".');
+    ConsumeToken(TLoxTokenType.LEFT_PAREN_SYMBOL, 'Esperado "(" depois de "for".');
 
-    if MatchToken(TTokenType.SEMICOLON_SYMBOL) then
+    if MatchToken(TLoxTokenType.SEMICOLON_SYMBOL) then
       Initializer := nil
-    else if MatchToken(TTokenType.VAR_KEYWORD) then
+    else if MatchToken(TLoxTokenType.VAR_KEYWORD) then
       Initializer := ProcessVarDeclaration()
     else
       Initializer := ProcessExpressionStatements();
 
-    if not CheckToken(TTokenType.SEMICOLON_SYMBOL) then
+    if not CheckToken(TLoxTokenType.SEMICOLON_SYMBOL) then
       Condition := ProcessExpression()
     else
       Condition := nil;
 
-    ConsumeToken(TTokenType.SEMICOLON_SYMBOL, 'Esperado ";" após condição do loop.');
+    ConsumeToken(TLoxTokenType.SEMICOLON_SYMBOL, 'Esperado ";" após condição do loop.');
 
     Increment := nil;
 
-    if not CheckToken(TTokenType.RIGHT_PAREN_SYMBOL) then
+    if not CheckToken(TLoxTokenType.RIGHT_PAREN_SYMBOL) then
       Increment := ProcessExpression();
 
-    ConsumeToken(TTokenType.RIGHT_PAREN_SYMBOL, 'Esperado ")" depois da cláusula "for".');
+    ConsumeToken(TLoxTokenType.RIGHT_PAREN_SYMBOL, 'Esperado ")" depois da cláusula "for".');
 
     Body := ProcessStatement();
 
@@ -600,10 +600,10 @@ begin
   Inc(FLoopDepth);
   try
 
-    ConsumeToken(TTokenType.LEFT_PAREN_SYMBOL, 'Esperado "(" depois de "while".');
+    ConsumeToken(TLoxTokenType.LEFT_PAREN_SYMBOL, 'Esperado "(" depois de "while".');
     Condition := ProcessExpression();
 
-    ConsumeToken(TTokenType.RIGHT_PAREN_SYMBOL, 'Esperado ")" após a condição.');
+    ConsumeToken(TLoxTokenType.RIGHT_PAREN_SYMBOL, 'Esperado ")" após a condição.');
     Body := ProcessStatement();
 
     Result := TWhileStatementNode.Create(Condition, Body);
@@ -618,14 +618,14 @@ var
   ThenBranch,
   ElseBranch: TStatementNode;
 begin
-  ConsumeToken(TTokenType.LEFT_PAREN_SYMBOL, 'Esperado "(" depois do "if".');
+  ConsumeToken(TLoxTokenType.LEFT_PAREN_SYMBOL, 'Esperado "(" depois do "if".');
   Condition := ProcessExpression();
 
-  ConsumeToken(TTokenType.RIGHT_PAREN_SYMBOL, 'Esperado ")" após a condição "if".');
+  ConsumeToken(TLoxTokenType.RIGHT_PAREN_SYMBOL, 'Esperado ")" após a condição "if".');
 
   ThenBranch := ProcessStatement();
 
-  if MatchToken(TTokenType.ELSE_KEYWORD) then
+  if MatchToken(TLoxTokenType.ELSE_KEYWORD) then
     ElseBranch := ProcessStatement()
   else
     ElseBranch := nil;
@@ -638,11 +638,11 @@ begin
   Result := nil;
 
   try
-    if MatchToken(TTokenType.CLASS_KEYWORD) then
+    if MatchToken(TLoxTokenType.CLASS_KEYWORD) then
       Result := ProcessClassDeclaration()
-    else if MatchToken(TTokenType.FUN_KEYWORD) then
+    else if MatchToken(TLoxTokenType.FUN_KEYWORD) then
       Result := ProcessFunctionDeclaration('function')
-    else if MatchToken(TTokenType.VAR_KEYWORD) then
+    else if MatchToken(TLoxTokenType.VAR_KEYWORD) then
       Result := ProcessVarDeclaration()
     else
       Result := ProcessStatement();
@@ -662,17 +662,17 @@ begin
   Inc(FLoopDepth);
   try
     // Body must be a ProcessBlockStatements
-    ConsumeToken(TTokenType.LEFT_BRACE_SYMBOL, 'Expect "{" after do.');
+    ConsumeToken(TLoxTokenType.LEFT_BRACE_SYMBOL, 'Expect "{" after do.');
     Body := ProcessBlockStatements();
 
     // While
-    ConsumeToken(TTokenType.WHILE_KEYWORD, 'Expect "while" after do loop body.');
+    ConsumeToken(TLoxTokenType.WHILE_KEYWORD, 'Expect "while" after do loop body.');
 
     // Condition
-    ConsumeToken(TTokenType.LEFT_PAREN_SYMBOL, 'Expect "(" after "while."');
+    ConsumeToken(TLoxTokenType.LEFT_PAREN_SYMBOL, 'Expect "(" after "while."');
     Condition := ProcessExpression();
-    ConsumeToken(TTokenType.RIGHT_PAREN_SYMBOL, 'Expect ")" after while condition.');
-    ConsumeToken(TTokenType.SEMICOLON_SYMBOL, 'Expect ";" after while condition.');
+    ConsumeToken(TLoxTokenType.RIGHT_PAREN_SYMBOL, 'Expect ")" after while condition.');
+    ConsumeToken(TLoxTokenType.SEMICOLON_SYMBOL, 'Expect ";" after while condition.');
 
     Body.Add(TIfStatementNode.Create(Condition, TBlockStatementNode.Create(TObjectList<TStatementNode>.Create()), TBreakStatementNode.Create()));
 
@@ -690,28 +690,28 @@ end;
 
 function TParser.ProcessClassDeclaration(): TStatementNode;
 var
-  Name: TToken;
+  Name: TLoxToken;
   Methods: TObjectList<TFunctionStatementNode>;
   Superclass: TVariableExpressionNode;
 begin
-  Name := ConsumeToken(TTokenType.IDENTIFIER_TOKEN, 'Espere o nome da classe.');
+  Name := ConsumeToken(TLoxTokenType.IDENTIFIER_TOKEN, 'Espere o nome da classe.');
 
-  if MatchToken(TTokenType.LESS_SYMBOL) then
+  if MatchToken(TLoxTokenType.LESS_SYMBOL) then
   begin
-    ConsumeToken(TTokenType.IDENTIFIER_TOKEN, 'Esperado o nome da superclasse.');
+    ConsumeToken(TLoxTokenType.IDENTIFIER_TOKEN, 'Esperado o nome da superclasse.');
     Superclass := TVariableExpressionNode.Create(PreviousToken());
   end
   else
     Superclass := nil;
 
-  ConsumeToken(TTokenType.LEFT_BRACE_SYMBOL, 'Esperado "{" antes do corpo da classe');
+  ConsumeToken(TLoxTokenType.LEFT_BRACE_SYMBOL, 'Esperado "{" antes do corpo da classe');
 
   Methods := TObjectList<TFunctionStatementNode>.Create();
 
-  while not CheckToken(TTokenType.RIGHT_BRACE_SYMBOL) and not IsAtEnd() do
+  while not CheckToken(TLoxTokenType.RIGHT_BRACE_SYMBOL) and not IsAtEnd() do
     Methods.Add(ProcessFunctionDeclaration('method'));
 
-  ConsumeToken(TTokenType.RIGHT_BRACE_SYMBOL, 'Esperado "}" após o corpo da classe.');
+  ConsumeToken(TLoxTokenType.RIGHT_BRACE_SYMBOL, 'Esperado "}" após o corpo da classe.');
 
   Result := TClassStatementNode.Create(Name, Superclass, Methods);
 
@@ -719,28 +719,28 @@ end;
 
 function TParser.ProcessFunctionDeclaration(Kind: string): TFunctionStatementNode;
 var
-  Name: TToken;
-  Parameters: TObjectList<TToken>;
+  Name: TLoxToken;
+  Parameters: TObjectList<TLoxToken>;
   Body: TObjectList<TStatementNode>;
 begin
-  Name := ConsumeToken(TTokenType.IDENTIFIER_TOKEN, 'Esperado o nome ' + kind + '.');
+  Name := ConsumeToken(TLoxTokenType.IDENTIFIER_TOKEN, 'Esperado o nome ' + kind + '.');
 
-  ConsumeToken(TTokenType.LEFT_PAREN_SYMBOL, 'Esperado "(" após o nome ' + kind + ' .');
+  ConsumeToken(TLoxTokenType.LEFT_PAREN_SYMBOL, 'Esperado "(" após o nome ' + kind + ' .');
 
-  Parameters := TObjectList<TToken>.Create();
+  Parameters := TObjectList<TLoxToken>.Create();
 
-  if not CheckToken(TTokenType.RIGHT_PAREN_SYMBOL) then
+  if not CheckToken(TLoxTokenType.RIGHT_PAREN_SYMBOL) then
   begin
     repeat
       if (Parameters.Count >= 255) then
         Error(PeekToken(), 'Não pode ter mais de 255 parâmetros.');
 
-      Parameters.Add(ConsumeToken(TTokenType.IDENTIFIER_TOKEN, 'Espere o nome do parâmetro.'));
-    until not MatchToken(TTokenType.COMMA_SYMBOL);
+      Parameters.Add(ConsumeToken(TLoxTokenType.IDENTIFIER_TOKEN, 'Espere o nome do parâmetro.'));
+    until not MatchToken(TLoxTokenType.COMMA_SYMBOL);
   end;
 
-  ConsumeToken(TTokenType.RIGHT_PAREN_SYMBOL, 'Esperado ")" depois dos parâmetros.');
-  ConsumeToken(TTokenType.LEFT_BRACE_SYMBOL, 'Esperado "{" antes ' + kind + ' body.');
+  ConsumeToken(TLoxTokenType.RIGHT_PAREN_SYMBOL, 'Esperado ")" depois dos parâmetros.');
+  ConsumeToken(TLoxTokenType.LEFT_BRACE_SYMBOL, 'Esperado "{" antes ' + kind + ' body.');
 
   Body := ProcessBlockStatements();
 
@@ -749,17 +749,17 @@ end;
 
 function TParser.ProcessVarDeclaration(): TStatementNode;
 var
-  Name: TToken;
+  Name: TLoxToken;
   Initializer: TExpressionNode;
 begin
-  Name := ConsumeToken(TTokenType.IDENTIFIER_TOKEN, 'Esperado o nome da variável.');
+  Name := ConsumeToken(TLoxTokenType.IDENTIFIER_TOKEN, 'Esperado o nome da variável.');
 
-  if MatchToken(TTokenType.EQUAL_SYMBOL) then
+  if MatchToken(TLoxTokenType.EQUAL_SYMBOL) then
     Initializer := ProcessExpression()
   else
     Initializer := nil;
 
-  ConsumeToken(TTokenType.SEMICOLON_SYMBOL, 'Esperado ";" após declaração de variável.');
+  ConsumeToken(TLoxTokenType.SEMICOLON_SYMBOL, 'Esperado ";" após declaração de variável.');
   Result := TVarStatementNode.Create(Name, Initializer);
 end;
 
@@ -768,7 +768,7 @@ var
   expr: TExpressionNode;
 begin
   Expr := ProcessExpression();
-  ConsumeToken(TTokenType.SEMICOLON_SYMBOL, 'Esperado ";" depois da expressão.');
+  ConsumeToken(TLoxTokenType.SEMICOLON_SYMBOL, 'Esperado ";" depois da expressão.');
   Result := TExpressionStatementNode.Create(expr);
 end;
 
@@ -778,10 +778,10 @@ var
 begin
   Statements := TObjectList<TStatementNode>.Create();
 
-  while not CheckToken(TTokenType.RIGHT_BRACE_SYMBOL) and not IsAtEnd() do
+  while not CheckToken(TLoxTokenType.RIGHT_BRACE_SYMBOL) and not IsAtEnd() do
     Statements.add(ProcessDeclaration());
 
-  ConsumeToken(TTokenType.RIGHT_BRACE_SYMBOL, 'Espere "}" após o bloco.');
+  ConsumeToken(TLoxTokenType.RIGHT_BRACE_SYMBOL, 'Espere "}" após o bloco.');
   Result := Statements;
 end;
 
@@ -791,7 +791,7 @@ var
 begin
   Value := ProcessExpression();
 
-  ConsumeToken(TTokenType.SEMICOLON_SYMBOL, 'Esperado ";" depois do valor.');
+  ConsumeToken(TLoxTokenType.SEMICOLON_SYMBOL, 'Esperado ";" depois do valor.');
 
   Result := TPrintStatementNode.Create(Value);
 end;

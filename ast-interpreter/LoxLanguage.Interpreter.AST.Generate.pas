@@ -54,7 +54,7 @@ begin
   Writer.Add('');
 
 
-  Writer.Add('function ' + className + BaseName + '.Accept(Visitor: IVisitor): TLoxValue; ');
+  Writer.Add('function ' + className + BaseName + '.Accept(Visitor: IAstVisitor): TLoxValue; ');
   Writer.Add('begin');
   Writer.Add('  Result := Visitor.Visit(Self);');
   Writer.Add('end;');
@@ -83,7 +83,7 @@ begin
   // Metodos publicos.
   Writer.Add('  public');
   Writer.Add('    constructor Create(' + FieldList + ');');
-  Writer.Add('    function Accept(Visitor: IVisitor): TLoxValue; override; ');
+  Writer.Add('    function Accept(Visitor: IAstVisitor): TLoxValue; override; ');
 
   // Propriedades publicas.
   fields := fieldList.split(['; ']);
@@ -102,7 +102,7 @@ var
   AstGrupo: TAstGrupo;
   AstItem: TAstItem;
 begin
-  Writer.Add('  IVisitor = interface');
+  Writer.Add('  IAstVisitor = interface');
   Writer.Add('  [''{E92FFE0B-F01A-4F30-BF88-0C866382851F}'']');
 
   for AstGrupo in AstGrupos do
@@ -148,10 +148,10 @@ begin
   Writer.Add('');
   Writer.Add('type');
   Writer.Add('');
-  Writer.Add('  IVisitor = interface;');
+  Writer.Add('  IAstVisitor = interface;');
   Writer.Add('');
-  Writer.Add('  TASTNode = class');
-  Writer.Add('    function Accept(Visitor: IVisitor): TLoxValue; virtual; abstract;');
+  Writer.Add('  TAstNode = class');
+  Writer.Add('    function Accept(Visitor: IAstVisitor): TLoxValue; virtual; abstract;');
   Writer.Add('  end;');
   Writer.Add('');
 
@@ -159,7 +159,7 @@ begin
   begin
     Writer.Add('  { T' + AstGrupo.Nome + ' }');
     Writer.Add('');
-    Writer.Add('  T' + AstGrupo.Nome + ' = class(TASTNode)');
+    Writer.Add('  T' + AstGrupo.Nome + ' = class(TAstNode)');
     Writer.Add('  end;');
 
     for AstItem in AstGrupo.Items do

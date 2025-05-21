@@ -21,7 +21,7 @@ type
     procedure Error(LineNro: Integer; Msg: string);
     procedure Report(LineNro: Integer; Where, Msg: string);
     procedure Run(source: string);
-    procedure ParserError(Token: TToken; Msg: string);
+    procedure ParserError(Token: TLoxToken; Msg: string);
   public
     procedure RunFile(Path: string);
     procedure RunScript(Script: string);
@@ -54,7 +54,7 @@ begin
   Report(LineNro, '', Msg);
 end;
 
-procedure TLoxRunner.ParserError(Token: TToken; Msg: string);
+procedure TLoxRunner.ParserError(Token: TLoxToken; Msg: string);
 begin
   Report(Token.LineNro, '', Msg);
 end;
@@ -62,11 +62,11 @@ end;
 procedure TLoxRunner.Run(source: string);
 var
   Scanner: TScanner;
-  Tokens: TObjectList<TToken>;
+  Tokens: TObjectList<TLoxToken>;
   Parser: TParser;
   Statements: TObjectList<TStatementNode>;
-  Interpreter: IVisitor;
-  Resolver: IVisitor;
+  Interpreter: IAstVisitor;
+  Resolver: IAstVisitor;
 begin
   FHadError := False;
 
@@ -83,12 +83,12 @@ begin
   if (FHadError) then
     Halt(64);
 
-  Interpreter := TInterpreter.Create();
+  Interpreter := TAstInterpreterVisitor.Create();
 
-  Resolver := TResolver.Create(TInterpreter(Interpreter));
-  TResolver(Resolver).Resolve(Statements);
+  Resolver := TResolverVisitor.Create(TAstInterpreterVisitor(Interpreter));
+  TResolverVisitor(Resolver).Resolve(Statements);
 
-  TInterpreter(Interpreter).Interpret(Statements);
+  TAstInterpreterVisitor(Interpreter).Interpret(Statements);
 end;
 
 procedure TLoxRunner.RunFile(Path: string);

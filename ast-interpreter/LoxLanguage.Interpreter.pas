@@ -10,14 +10,13 @@ uses
   System.Classes,
   Generics.Collections,
   System.DateUtils,
-  VCL.Dialogs,
+  Vcl.Dialogs,
   LoxLanguage.Interpreter.Env,
   LoxLanguage.Interpreter.AST,
   LoxLanguage.Interpreter.Types;
 
 type
-
-  TInterpreter = class(TInterfacedObject, IVisitor)
+  TAstInterpreterVisitor = class(TInterfacedObject, IAstVisitor)
   private
     FGlobals: TEnvironment;
     FEnvironment: TEnvironment;
@@ -25,40 +24,31 @@ type
     function Evaluate(Expression: TExpressionNode): TLoxValue;
     function IsTruthy(Value: TLoxValue): Boolean;
     function IsEqual(ValueA, ValueB: TLoxValue): Boolean;
-    procedure CheckNumberOperands(TokenOperator: TToken;
-      left, Right: TLoxValue);
+    procedure CheckNumberOperands(TokenOperator: TLoxToken; left, Right: TLoxValue);
     function Stringify(Value: TLoxValue): string;
     procedure Execute(Statement: TStatementNode);
-    procedure ExecuteBlock(Statements: TObjectList<TStatementNode>;
-      Environment: TEnvironment);
-    function LookUpVariable(Name: TToken; Expr: TExpressionNode): TLoxValue;
-    procedure CheckNumberOperand(Oper: TToken; Operand: TLoxValue);
+    procedure ExecuteBlock(Statements: TObjectList<TStatementNode>; Environment: TEnvironment);
+    function LookUpVariable(name: TLoxToken; Expr: TExpressionNode): TLoxValue;
+    procedure CheckNumberOperand(Oper: TLoxToken; Operand: TLoxValue);
   private
     function Visit(AssignExpression: TAssignExpressionNode): TLoxValue; overload;
     function Visit(BinaryExpression: TBinaryExpressionNode): TLoxValue; overload;
     function Visit(CallExpression: TCallExpressionNode): TLoxValue; overload;
     function Visit(GeTExpressionNode: TGeTExpressionNode): TLoxValue; overload;
-    function Visit(GroupingExpression: TGroupingExpressionNode)
-      : TLoxValue; overload;
-    function Visit(LiteralExpression: TLiteralExpressionNode)
-      : TLoxValue; overload;
-    function Visit(LogicalExpression: TLogicalExpressionNode)
-      : TLoxValue; overload;
+    function Visit(GroupingExpression: TGroupingExpressionNode): TLoxValue; overload;
+    function Visit(LiteralExpression: TLiteralExpressionNode): TLoxValue; overload;
+    function Visit(LogicalExpression: TLogicalExpressionNode): TLoxValue; overload;
     function Visit(SeTExpressionNode: TSeTExpressionNode): TLoxValue; overload;
     function Visit(SuperExpression: TSuperExpressionNode): TLoxValue; overload;
     function Visit(ThisExpression: TThisExpressionNode): TLoxValue; overload;
     function Visit(UnaryExpression: TUnaryExpressionNode): TLoxValue; overload;
-    function Visit(VariableExpression: TVariableExpressionNode)
-      : TLoxValue; overload;
+    function Visit(VariableExpression: TVariableExpressionNode): TLoxValue; overload;
     function Visit(BlockStatement: TBlockStatementNode): TLoxValue; overload;
     function Visit(BreakStatement: TBreakStatementNode): TLoxValue; overload;
-    function Visit(ContinueStatement: TContinueStatementNode)
-      : TLoxValue; overload;
-    function Visit(ExpressionStatement: TExpressionStatementNode)
-      : TLoxValue; overload;
+    function Visit(ContinueStatement: TContinueStatementNode): TLoxValue; overload;
+    function Visit(ExpressionStatement: TExpressionStatementNode): TLoxValue; overload;
     function Visit(IfStatement: TIfStatementNode): TLoxValue; overload;
-    function Visit(FunctionStatement: TFunctionStatementNode)
-      : TLoxValue; overload;
+    function Visit(FunctionStatement: TFunctionStatementNode): TLoxValue; overload;
     function Visit(PrintStatement: TPrintStatementNode): TLoxValue; overload;
     function Visit(ClassStatement: TClassStatementNode): TLoxValue; overload;
     function Visit(ReturnStatement: TReturnStatementNode): TLoxValue; overload;
@@ -75,15 +65,13 @@ type
   TCallable = class
   private
   public
-    function Call(interpreter: TInterpreter; Arguments: TList<TLoxValue>)
-      : TLoxValue; virtual; abstract;
+    function Call(interpreter: TAstInterpreterVisitor; Arguments: TList<TLoxValue>): TLoxValue; virtual; abstract;
     function Arity(): Integer; virtual; abstract;
   end;
 
   TClockFunction = class(TCallable)
   public
-    function Call(interpreter: TInterpreter; Arguments: TList<TLoxValue>)
-      : TLoxValue; override;
+    function Call(interpreter: TAstInterpreterVisitor; Arguments: TList<TLoxValue>): TLoxValue; override;
     function Arity: Integer; override;
     function ToString(): string; override;
   end;
@@ -110,14 +98,12 @@ type
     FMethods: TDictionary<string, TCallableFunction>;
     FSuperclass: TLoxValue;
   public
-    constructor Create(Name: string; Superclass: TLoxValue;
-      Methods: TDictionary<string, TCallableFunction>);
-    function FindMethod(Name: string): TCallableFunction;
+    constructor Create(name: string; Superclass: TLoxValue; Methods: TDictionary<string, TCallableFunction>);
+    function FindMethod(name: string): TCallableFunction;
     function ToString(): string; override;
-    function Call(interpreter: TInterpreter; Arguments: TList<TLoxValue>)
-      : TLoxValue; override;
-    function Arity: Integer; override;
-    property Name: string read FName;
+    function Call(interpreter: TAstInterpreterVisitor; Arguments: TList<TLoxValue>): TLoxValue; override;
+    function Arity(): Integer; override;
+    property name: string read FName;
   end;
 
   TLoxObjectInstance = class
@@ -127,8 +113,8 @@ type
   public
     constructor Create(AClass: TLoxClass);
     function ToString(): string; override;
-    function GetValue(Name: TToken): TLoxValue;
-    procedure SetValue(Name: TToken; Value: TLoxValue);
+    function GetValue(name: TLoxToken): TLoxValue;
+    procedure SetValue(name: TLoxToken; Value: TLoxValue);
   end;
 
   TCallableFunction = class(TCallable)
@@ -137,11 +123,9 @@ type
     FClosure: TEnvironment;
     FIsInitializer: Boolean;
   public
-    constructor Create(Declaration: TFunctionStatementNode; Closure: TEnvironment;
-      IsInitializer: Boolean);
+    constructor Create(Declaration: TFunctionStatementNode; Closure: TEnvironment; IsInitializer: Boolean);
     function Bind(Instance: TLoxObjectInstance): TLoxValue;
-    function Call(interpreter: TInterpreter; Arguments: TList<TLoxValue>)
-      : TLoxValue; override;
+    function Call(interpreter: TAstInterpreterVisitor; Arguments: TList<TLoxValue>): TLoxValue; override;
     function Arity: Integer; override;
     function ToString(): string; override;
   end;
@@ -151,15 +135,14 @@ var
 
 implementation
 
-{ TInterpreter }
+{ TAstInterpreterVisitor }
 
-function TInterpreter.Visit(GroupingExpression: TGroupingExpressionNode)
-  : TLoxValue;
+function TAstInterpreterVisitor.Visit(GroupingExpression: TGroupingExpressionNode): TLoxValue;
 begin
   Result := Evaluate(GroupingExpression.Expr);
 end;
 
-constructor TInterpreter.Create;
+constructor TAstInterpreterVisitor.Create;
 var
   ClockFunction: TLoxValue;
 begin
@@ -168,40 +151,36 @@ begin
 
   FLocals := TDictionary<TExpressionNode, Integer>.Create();
 
-  ClockFunction := Default (TLoxValue);
+  ClockFunction := default(TLoxValue);
   ClockFunction.ValueType := TLoxValueType.IS_CALLABLE;
   ClockFunction.CallableValue := TClockFunction.Create();
 
   FGlobals.Define('clock', ClockFunction);
 end;
 
-destructor TInterpreter.Destroy;
+destructor TAstInterpreterVisitor.Destroy;
 begin
   FEnvironment.Free();
   inherited;
 end;
 
-function TInterpreter.Evaluate(Expression: TExpressionNode): TLoxValue;
+function TAstInterpreterVisitor.Evaluate(Expression: TExpressionNode): TLoxValue;
 begin
   Result := Expression.Accept(Self);
 end;
 
-function TInterpreter.IsEqual(ValueA, ValueB: TLoxValue): Boolean;
+function TAstInterpreterVisitor.IsEqual(ValueA, ValueB: TLoxValue): Boolean;
 begin
 
-  if (ValueA.ValueType = TLoxValueType.IS_NULL) and
-    (ValueB.ValueType = TLoxValueType.IS_NULL) then
+  if (ValueA.ValueType = TLoxValueType.IS_NULL) and (ValueB.ValueType = TLoxValueType.IS_NULL) then
     Result := True
-  else if (ValueA.ValueType = TLoxValueType.IS_UNDEF) and
-    (ValueB.ValueType = TLoxValueType.IS_UNDEF) then
+  else if (ValueA.ValueType = TLoxValueType.IS_UNDEF) and (ValueB.ValueType = TLoxValueType.IS_UNDEF) then
     Result := True
   else if (ValueA.ValueType <> ValueB.ValueType) then
     Result := false
-  else if (ValueA.ValueType = TLoxValueType.IS_NULL) or
-    (ValueB.ValueType = TLoxValueType.IS_NULL) then
+  else if (ValueA.ValueType = TLoxValueType.IS_NULL) or (ValueB.ValueType = TLoxValueType.IS_NULL) then
     Result := false
-  else if (ValueA.ValueType = TLoxValueType.IS_UNDEF) or
-    (ValueB.ValueType = TLoxValueType.IS_UNDEF) then
+  else if (ValueA.ValueType = TLoxValueType.IS_UNDEF) or (ValueB.ValueType = TLoxValueType.IS_UNDEF) then
     Result := false
   else
   begin
@@ -233,85 +212,80 @@ begin
 
 end;
 
-procedure TInterpreter.CheckNumberOperands(TokenOperator: TToken;
-  left, Right: TLoxValue);
+procedure TAstInterpreterVisitor.CheckNumberOperands(TokenOperator: TLoxToken; left, Right: TLoxValue);
 begin
-  if (left.ValueType = TLoxValueType.IS_DOUBLE) and
-    (Right.ValueType = TLoxValueType.IS_DOUBLE) then
+  if (left.ValueType = TLoxValueType.IS_DOUBLE) and (Right.ValueType = TLoxValueType.IS_DOUBLE) then
     Exit();
 
-  raise ERuntimeError.Create(TokenOperator, 'Operandos devem ser números.');
+  raise ELoxRuntimeError.Create(TokenOperator, 'Operandos devem ser números.');
 end;
 
-function TInterpreter.Visit(BinaryExpression: TBinaryExpressionNode): TLoxValue;
+function TAstInterpreterVisitor.Visit(BinaryExpression: TBinaryExpressionNode): TLoxValue;
 var
   Left, Right: TLoxValue;
 begin
-  Result := Default (TLoxValue);
+  Result := default(TLoxValue);
 
   Left := Evaluate(BinaryExpression.left);
   Right := Evaluate(BinaryExpression.Right);
 
   case BinaryExpression.Operador.TokenType of
-    TTokenType.NOT_EQUAL_PAIRS_SYMBOL:
+    TLoxTokenType.NOT_EQUAL_PAIRS_SYMBOL:
       begin
         Result.ValueType := TLoxValueType.IS_BOOLEAN;
-        Result.BooleanValue := not IsEqual(left, Right);
+        Result.BooleanValue := not IsEqual(Left, Right);
       end;
-    TTokenType.EQUAL_EQUAL_PAIRS_SYMBOL:
+    TLoxTokenType.EQUAL_EQUAL_PAIRS_SYMBOL:
       begin
         Result.ValueType := TLoxValueType.IS_BOOLEAN;
-        Result.BooleanValue := IsEqual(left, Right);
+        Result.BooleanValue := IsEqual(Left, Right);
       end;
-    TTokenType.GREATER_SYMBOL:
+    TLoxTokenType.GREATER_SYMBOL:
       begin
-        CheckNumberOperands(BinaryExpression.Operador, left, Right);
+        CheckNumberOperands(BinaryExpression.Operador, Left, Right);
         Result.ValueType := TLoxValueType.IS_BOOLEAN;
-        Result.BooleanValue := left.DoubleValue > Right.DoubleValue;
+        Result.BooleanValue := Left.DoubleValue > Right.DoubleValue;
       end;
-    TTokenType.GREATER_EQUAL_PAIRS_SYMBOL:
+    TLoxTokenType.GREATER_EQUAL_PAIRS_SYMBOL:
       begin
-        CheckNumberOperands(BinaryExpression.Operador, left, Right);
+        CheckNumberOperands(BinaryExpression.Operador, Left, Right);
         Result.ValueType := TLoxValueType.IS_BOOLEAN;
-        Result.BooleanValue := left.DoubleValue >= Right.DoubleValue;
+        Result.BooleanValue := Left.DoubleValue >= Right.DoubleValue;
       end;
-    TTokenType.LESS_SYMBOL:
+    TLoxTokenType.LESS_SYMBOL:
       begin
-        CheckNumberOperands(BinaryExpression.Operador, left, Right);
+        CheckNumberOperands(BinaryExpression.Operador, Left, Right);
         Result.ValueType := TLoxValueType.IS_BOOLEAN;
-        Result.BooleanValue := left.DoubleValue < Right.DoubleValue;
+        Result.BooleanValue := Left.DoubleValue < Right.DoubleValue;
       end;
-    TTokenType.LESS_EQUAL_PAIRS_SYMBOL:
+    TLoxTokenType.LESS_EQUAL_PAIRS_SYMBOL:
       begin
-        CheckNumberOperands(BinaryExpression.Operador, left, Right);
+        CheckNumberOperands(BinaryExpression.Operador, Left, Right);
         Result.ValueType := TLoxValueType.IS_BOOLEAN;
-        Result.BooleanValue := left.DoubleValue <= Right.DoubleValue;
+        Result.BooleanValue := Left.DoubleValue <= Right.DoubleValue;
       end;
-    TTokenType.MINUS_SYMBOL:
+    TLoxTokenType.MINUS_SYMBOL:
       begin
-        CheckNumberOperands(BinaryExpression.Operador, left, Right);
+        CheckNumberOperands(BinaryExpression.Operador, Left, Right);
         Result.ValueType := TLoxValueType.IS_DOUBLE;
-        Result.DoubleValue := left.DoubleValue - Right.DoubleValue;
+        Result.DoubleValue := Left.DoubleValue - Right.DoubleValue;
       end;
-    TTokenType.PLUS_SYMBOL:
+    TLoxTokenType.PLUS_SYMBOL:
       begin
-        if (left.ValueType = TLoxValueType.IS_DOUBLE) and
-           (Right.ValueType = TLoxValueType.IS_DOUBLE) then
+        if (Left.ValueType = TLoxValueType.IS_DOUBLE) and (Right.ValueType = TLoxValueType.IS_DOUBLE) then
         begin
           Result.ValueType := TLoxValueType.IS_DOUBLE;
-          Result.DoubleValue := left.DoubleValue + Right.DoubleValue;
+          Result.DoubleValue := Left.DoubleValue + Right.DoubleValue;
         end
-        else if (left.ValueType = TLoxValueType.IS_STRING) and
-                (Right.ValueType = TLoxValueType.IS_STRING) then
+        else if (Left.ValueType = TLoxValueType.IS_STRING) and (Right.ValueType = TLoxValueType.IS_STRING) then
         begin
           Result.ValueType := TLoxValueType.IS_STRING;
 
-          Result.StrValue := left.StrValue + Result.StrValue;
+          Result.StrValue := Left.StrValue + Result.StrValue;
 
           // StrPas(, Concat(Left.StrValue, Right.StrValue));
         end
-        else if (left.ValueType = TLoxValueType.IS_STRING) or
-                (Right.ValueType = TLoxValueType.IS_STRING) then
+        else if (Left.ValueType = TLoxValueType.IS_STRING) or (Right.ValueType = TLoxValueType.IS_STRING) then
         begin
           Result.ValueType := TLoxValueType.IS_STRING;
           Result.StrValue := ShortString(Stringify(Left) + Stringify(Right));
@@ -319,24 +293,23 @@ begin
           // StrPas(, Concat(Left.StrValue, Right.StrValue));
         end
         else
-          raise ERuntimeError.Create(BinaryExpression.Operador,
-            'Os operandos devem ter dois números ou duas strings');
+          raise ELoxRuntimeError.Create(BinaryExpression.Operador, 'Os operandos devem ter dois números ou duas strings');
       end;
-    TTokenType.SLASH_SYMBOL:
+    TLoxTokenType.SLASH_SYMBOL:
       begin
-        CheckNumberOperands(BinaryExpression.Operador, left, Right);
+        CheckNumberOperands(BinaryExpression.Operador, Left, Right);
 
         if (Right.DoubleValue = 0) then
-          raise ERuntimeError.Create(BinaryExpression.Operador, 'Divisão por zero.');
+          raise ELoxRuntimeError.Create(BinaryExpression.Operador, 'Divisão por zero.');
 
         Result.ValueType := TLoxValueType.IS_DOUBLE;
-        Result.DoubleValue := left.DoubleValue / Right.DoubleValue;
+        Result.DoubleValue := Left.DoubleValue / Right.DoubleValue;
       end;
-    TTokenType.STAR_SYMBOL:
+    TLoxTokenType.STAR_SYMBOL:
       begin
-        CheckNumberOperands(BinaryExpression.Operador, left, Right);
+        CheckNumberOperands(BinaryExpression.Operador, Left, Right);
         Result.ValueType := TLoxValueType.IS_DOUBLE;
-        Result.DoubleValue := left.DoubleValue * Right.DoubleValue;
+        Result.DoubleValue := Left.DoubleValue * Right.DoubleValue;
       end;
   else
     Result.ValueType := TLoxValueType.IS_NULL;
@@ -344,25 +317,24 @@ begin
 
 end;
 
-function TInterpreter.Visit(LiteralExpression: TLiteralExpressionNode)
-  : TLoxValue;
+function TAstInterpreterVisitor.Visit(LiteralExpression: TLiteralExpressionNode): TLoxValue;
 begin
   Result := LiteralExpression.Value;
 end;
 
-function TInterpreter.Visit(UnaryExpression: TUnaryExpressionNode): TLoxValue;
+function TAstInterpreterVisitor.Visit(UnaryExpression: TUnaryExpressionNode): TLoxValue;
 var
   Right: TLoxValue;
 begin
 
   Right := Evaluate(UnaryExpression.Right);
 
-  if UnaryExpression.Operador.TokenType = TTokenType.NOT_SYMBOL then
+  if UnaryExpression.Operador.TokenType = TLoxTokenType.NOT_SYMBOL then
   begin
     Result.ValueType := TLoxValueType.IS_DOUBLE;
     Result.BooleanValue := not IsTruthy(Right);
   end
-  else if UnaryExpression.Operador.TokenType = TTokenType.MINUS_SYMBOL then
+  else if UnaryExpression.Operador.TokenType = TLoxTokenType.MINUS_SYMBOL then
   begin
     CheckNumberOperand(UnaryExpression.Operador, Right);
     Result.ValueType := TLoxValueType.IS_DOUBLE;
@@ -373,15 +345,15 @@ begin
 
 end;
 
-procedure TInterpreter.CheckNumberOperand(Oper: TToken; Operand: TLoxValue);
+procedure TAstInterpreterVisitor.CheckNumberOperand(Oper: TLoxToken; Operand: TLoxValue);
 begin
   if (Operand.ValueType = TLoxValueType.IS_DOUBLE) then
     Exit();
 
-  raise ERuntimeError.Create(Oper, 'O operando deve ser um número.');
+  raise ELoxRuntimeError.Create(Oper, 'O operando deve ser um número.');
 end;
 
-function TInterpreter.IsTruthy(Value: TLoxValue): Boolean;
+function TAstInterpreterVisitor.IsTruthy(Value: TLoxValue): Boolean;
 begin
 
   if (Value.ValueType = TLoxValueType.IS_NULL) then
@@ -394,7 +366,7 @@ begin
 
 end;
 
-function TInterpreter.Stringify(Value: TLoxValue): string;
+function TAstInterpreterVisitor.Stringify(Value: TLoxValue): string;
 var
   OldDecimalSeparator: Char;
 begin
@@ -417,7 +389,7 @@ begin
   else if Value.ValueType = TLoxValueType.IS_BOOLEAN then
     Result := BoolToStr(Value.BooleanValue)
   else if Value.ValueType = TLoxValueType.IS_STRING then
-    Result := String(Value.StrValue)
+    Result := string(Value.StrValue)
   else if Value.ValueType = TLoxValueType.IS_INT32 then
     Result := IntToStr(Value.Int32Value)
   else if Value.ValueType = TLoxValueType.IS_INT64 then
@@ -427,7 +399,7 @@ begin
 
 end;
 
-function TInterpreter.Visit(WhileStatement: TWhileStatementNode): TLoxValue;
+function TAstInterpreterVisitor.Visit(WhileStatement: TWhileStatementNode): TLoxValue;
 begin
   while IsTruthy(Evaluate(WhileStatement.Condition)) do
   begin
@@ -441,21 +413,21 @@ begin
     end;
   end;
 
-  Result := Default (TLoxValue);
+  Result := default(TLoxValue);
   Result.ValueType := TLoxValueType.IS_NULL;
 end;
 
-function TInterpreter.Visit(ContinueStatement: TContinueStatementNode): TLoxValue;
+function TAstInterpreterVisitor.Visit(ContinueStatement: TContinueStatementNode): TLoxValue;
 begin
   raise EContinueException.Create('');
 end;
 
-function TInterpreter.Visit(BreakStatement: TBreakStatementNode): TLoxValue;
+function TAstInterpreterVisitor.Visit(BreakStatement: TBreakStatementNode): TLoxValue;
 begin
   raise EBreakException.Create('');
 end;
 
-function TInterpreter.Visit(SuperExpression: TSuperExpressionNode): TLoxValue;
+function TAstInterpreterVisitor.Visit(SuperExpression: TSuperExpressionNode): TLoxValue;
 var
   Distance: Integer;
   Superclass: TLoxClass;
@@ -463,46 +435,41 @@ var
   Method: TCallableFunction;
 begin
   Distance := FLocals[SuperExpression];
-  Superclass := TLoxClassValue(FEnvironment.GetAt(Distance, 'super')
-    .ClassValue);
+  Superclass := TLoxClassValue(FEnvironment.GetAt(Distance, 'super').ClassValue);
 
-  Obj := TLoxObjectInstance(FEnvironment.GetAt(Distance - 1, 'this')
-    .ObjectInstanceValue);
+  Obj := TLoxObjectInstance(FEnvironment.GetAt(Distance - 1, 'this').ObjectInstanceValue);
 
   Method := Superclass.FindMethod(SuperExpression.Method.Lexeme);
 
   if (Method = nil) then
-    raise ERuntimeError.Create(SuperExpression.Method,
-      'Propriedade indefinida "' + SuperExpression.Method.Lexeme + '!".');
+    raise ELoxRuntimeError.Create(SuperExpression.Method, 'Propriedade indefinida "' + SuperExpression.Method.Lexeme + '!".');
 
   Result := Method.Bind(Obj);
 end;
 
-function TInterpreter.Visit(ThisExpression: TThisExpressionNode): TLoxValue;
+function TAstInterpreterVisitor.Visit(ThisExpression: TThisExpressionNode): TLoxValue;
 begin
   Result := LookUpVariable(ThisExpression.Keyword, ThisExpression);
 end;
 
-function TInterpreter.Visit(SeTExpressionNode: TSeTExpressionNode): TLoxValue;
+function TAstInterpreterVisitor.Visit(SeTExpressionNode: TSeTExpressionNode): TLoxValue;
 var
   Obj, Value: TLoxValue;
 begin
 
   Obj := Evaluate(SeTExpressionNode.Obj);
 
-  if not(Obj.ValueType = TLoxValueType.IS_OBJECT) then
-    raise ERuntimeError.Create(SeTExpressionNode.Name,
-      'Somente instâncias têm campos.');
+  if not (Obj.ValueType = TLoxValueType.IS_OBJECT) then
+    raise ELoxRuntimeError.Create(SeTExpressionNode.Name, 'Somente instâncias têm campos.');
 
   Value := Evaluate(SeTExpressionNode.Value);
-  TLoxObjectInstance(Obj.ObjectInstanceValue)
-    .SetValue(SeTExpressionNode.Name, Value);
+  TLoxObjectInstance(Obj.ObjectInstanceValue).SetValue(SeTExpressionNode.Name, Value);
 
   Result := Value;
 
 end;
 
-function TInterpreter.Visit(GeTExpressionNode: TGeTExpressionNode): TLoxValue;
+function TAstInterpreterVisitor.Visit(GeTExpressionNode: TGeTExpressionNode): TLoxValue;
 var
   Obj: TLoxValue;
 begin
@@ -510,16 +477,14 @@ begin
 
   if (Obj.ValueType = TLoxValueType.IS_OBJECT) then
   begin
-    Result := TLoxObjectInstance(Obj.ObjectInstanceValue)
-      .GetValue(GeTExpressionNode.Name);
+    Result := TLoxObjectInstance(Obj.ObjectInstanceValue).GetValue(GeTExpressionNode.Name);
     Exit();
   end;
 
-  raise ERuntimeError.Create(GeTExpressionNode.Name,
-    'Somente instâncias têm propriedades.');
+  raise ELoxRuntimeError.Create(GeTExpressionNode.Name, 'Somente instâncias têm propriedades.');
 end;
 
-function TInterpreter.Visit(ClassStatement: TClassStatementNode): TLoxValue;
+function TAstInterpreterVisitor.Visit(ClassStatement: TClassStatementNode): TLoxValue;
 var
   Value: TLoxValue;
   Methods: TDictionary<string, TCallableFunction>;
@@ -527,20 +492,18 @@ var
   Func: TCallableFunction;
   Superclass: TLoxValue;
 begin
-  Superclass := Default (TLoxValue);
+  Superclass := default(TLoxValue);
   Superclass.ValueType := TLoxValueType.IS_NULL;
 
   if Assigned(ClassStatement.Superclass) then
   begin
     Superclass := Evaluate(ClassStatement.Superclass);
 
-    if not(Superclass.ValueType in [TLoxValueType.IS_CLASS,
-      TLoxValueType.IS_OBJECT]) then
-      raise ERuntimeError.Create(ClassStatement.Superclass.Name,
-        'A superclasse deve ser uma classe.');
+    if not (Superclass.ValueType in [TLoxValueType.IS_CLASS, TLoxValueType.IS_OBJECT]) then
+      raise ELoxRuntimeError.Create(ClassStatement.Superclass.Name, 'A superclasse deve ser uma classe.');
   end;
 
-  Value := Default (TLoxValue);
+  Value := default(TLoxValue);
   Value.ValueType := TLoxValueType.IS_NULL;
   FEnvironment.Define(ClassStatement.Name.Lexeme, Value);
 
@@ -554,29 +517,27 @@ begin
 
   for Method in ClassStatement.Methods do
   begin
-    Func := TCallableFunction.Create(Method, FEnvironment,
-      Method.Name.Lexeme = 'init');
+    Func := TCallableFunction.Create(Method, FEnvironment, Method.Name.Lexeme = 'init');
     Methods.AddOrSetValue(Method.Name.Lexeme, Func);
   end;
 
   if Assigned(ClassStatement.Superclass) then
     FEnvironment := FEnvironment.Enclosing;
 
-  Value := Default (TLoxValue);
+  Value := default(TLoxValue);
   Value.ValueType := TLoxValueType.IS_OBJECT;
-  Value.ClassValue := TLoxClass.Create(ClassStatement.Name.Lexeme,
-    Superclass, Methods);
+  Value.ClassValue := TLoxClass.Create(ClassStatement.Name.Lexeme, Superclass, Methods);
   FEnvironment.Assign(ClassStatement.Name, Value);
 
-  Result := Default (TLoxValue);
+  Result := default(TLoxValue);
   Result.ValueType := TLoxValueType.IS_NULL;
 end;
 
-function TInterpreter.Visit(ReturnStatement: TReturnStatementNode): TLoxValue;
+function TAstInterpreterVisitor.Visit(ReturnStatement: TReturnStatementNode): TLoxValue;
 var
   Value: TLoxValue;
 begin
-  Result := Default (TLoxValue);
+  Result := default(TLoxValue);
   Result.ValueType := TLoxValueType.IS_NULL;
 
   if Assigned(ReturnStatement.Value) then
@@ -585,22 +546,20 @@ begin
   raise EReturnException.Create(Value);
 end;
 
-function TInterpreter.Visit(FunctionStatement: TFunctionStatementNode)
-  : TLoxValue;
+function TAstInterpreterVisitor.Visit(FunctionStatement: TFunctionStatementNode): TLoxValue;
 var
   FunctionValue: TLoxValue;
 begin
   FunctionValue.ValueType := TLoxValueType.IS_CALLABLE;
-  FunctionValue.CallableValue := TCallableFunction.Create(FunctionStatement,
-    FEnvironment, false);
+  FunctionValue.CallableValue := TCallableFunction.Create(FunctionStatement, FEnvironment, false);
 
   FEnvironment.Define(FunctionStatement.Name.Lexeme, FunctionValue);
 
-  Result := Default (TLoxValue);
+  Result := default(TLoxValue);
   Result.ValueType := TLoxValueType.IS_NULL;
 end;
 
-function TInterpreter.Visit(CallExpression: TCallExpressionNode): TLoxValue;
+function TAstInterpreterVisitor.Visit(CallExpression: TCallExpressionNode): TLoxValue;
 var
   Callee: TLoxValue;
   Arguments: TList<TLoxValue>;
@@ -615,32 +574,26 @@ begin
   for Argument in CallExpression.Arguments do
     Arguments.Add(Evaluate(Argument));
 
-  if not(Callee.ValueType in [TLoxValueType.IS_CALLABLE,
-    TLoxValueType.IS_CLASS, TLoxValueType.IS_OBJECT,
-    TLoxValueType.IS_METHOD]) then
-    raise ERuntimeError.Create(CallExpression.paren,
-      'Somente é permitido chamar funções e classes.');
+  if not (Callee.ValueType in [TLoxValueType.IS_CALLABLE, TLoxValueType.IS_CLASS, TLoxValueType.IS_OBJECT, TLoxValueType.IS_METHOD]) then
+    raise ELoxRuntimeError.Create(CallExpression.paren, 'Somente é permitido chamar funções e classes.');
 
   FuncValue := TCallable(Callee.CallableValue);
 
-  if not(Arguments.Count = FuncValue.Arity()) then
+  if not (Arguments.Count = FuncValue.Arity()) then
   begin
-    raise ERuntimeError.Create(CallExpression.paren,
-      'Experado ' + IntToStr(FuncValue.Arity()) + ' argumentos, mas tem ' +
-      IntToStr(Arguments.Count) + '.');
+    raise ELoxRuntimeError.Create(CallExpression.paren, 'Experado ' + IntToStr(FuncValue.Arity()) + ' argumentos, mas tem ' + IntToStr(Arguments.Count) + '.');
   end;
 
   Result := FuncValue.Call(Self, Arguments);
 end;
 
-function TInterpreter.Visit(LogicalExpression: TLogicalExpressionNode)
-  : TLoxValue;
+function TAstInterpreterVisitor.Visit(LogicalExpression: TLogicalExpressionNode): TLoxValue;
 var
   left: TLoxValue;
 begin
   left := Evaluate(LogicalExpression.left);
 
-  if (LogicalExpression.Operador.TokenType = TTokenType.OR_KEYWORD) then
+  if (LogicalExpression.Operador.TokenType = TLoxTokenType.OR_KEYWORD) then
   begin
     if IsTruthy(left) then
       Exit(left);
@@ -651,7 +604,7 @@ begin
   Result := Evaluate(LogicalExpression.Right);
 end;
 
-function TInterpreter.Visit(VarStatement: TVarStatementNode): TLoxValue;
+function TAstInterpreterVisitor.Visit(VarStatement: TVarStatementNode): TLoxValue;
 var
   Value: TLoxValue;
 begin
@@ -662,30 +615,30 @@ begin
 
   FEnvironment.Define(VarStatement.Name.Lexeme, Value);
 
-  Result := Default (TLoxValue);
+  Result := default(TLoxValue);
   Result.ValueType := TLoxValueType.IS_NULL;
 end;
 
-function TInterpreter.Visit(IfStatement: TIfStatementNode): TLoxValue;
+function TAstInterpreterVisitor.Visit(IfStatement: TIfStatementNode): TLoxValue;
 begin
   if (IsTruthy(Evaluate(IfStatement.Condition))) then
     Execute(IfStatement.ThenBranch)
   else if Assigned(IfStatement.ElseBranch) then
     Execute(IfStatement.ElseBranch);
 
-  Result := Default (TLoxValue);
+  Result := default(TLoxValue);
   Result.ValueType := TLoxValueType.IS_NULL;
 end;
 
-function TInterpreter.Visit(BlockStatement: TBlockStatementNode): TLoxValue;
+function TAstInterpreterVisitor.Visit(BlockStatement: TBlockStatementNode): TLoxValue;
 begin
   ExecuteBlock(BlockStatement.Statements, TEnvironment.Create(FEnvironment));
 
-  Result := Default (TLoxValue);
+  Result := default(TLoxValue);
   Result.ValueType := TLoxValueType.IS_NULL;
 end;
 
-function TInterpreter.Visit(AssignExpression: TAssignExpressionNode): TLoxValue;
+function TAstInterpreterVisitor.Visit(AssignExpression: TAssignExpressionNode): TLoxValue;
 var
   Value: TLoxValue;
   Distance: Integer;
@@ -700,14 +653,12 @@ begin
   Result := Value;
 end;
 
-function TInterpreter.Visit(VariableExpression: TVariableExpressionNode)
-  : TLoxValue;
+function TAstInterpreterVisitor.Visit(VariableExpression: TVariableExpressionNode): TLoxValue;
 begin
   Result := LookUpVariable(VariableExpression.Name, VariableExpression)
 end;
 
-function TInterpreter.LookUpVariable(Name: TToken; Expr: TExpressionNode)
-  : TLoxValue;
+function TAstInterpreterVisitor.LookUpVariable(Name: TLoxToken; Expr: TExpressionNode): TLoxValue;
 var
   Distance: Integer;
 begin
@@ -717,25 +668,23 @@ begin
     Result := FGlobals.Get(Name);
 end;
 
-procedure RuntimeError(Error: ERuntimeError);
+procedure RuntimeError(Error: ELoxRuntimeError);
 begin
-  Writeln(Error.Message + sLineBreak + '[Linha Nro: ' +
-    IntToStr(Error.token.LineNro) + ']');
+  Writeln(Error.Message + sLineBreak + '[Linha Nro: ' + IntToStr(Error.token.LineNro) + ']');
   HadRuntimeError := True;
 end;
 
-procedure TInterpreter.Execute(Statement: TStatementNode);
+procedure TAstInterpreterVisitor.Execute(Statement: TStatementNode);
 begin
   Statement.Accept(Self);
 end;
 
-procedure TInterpreter.Resolve(Expr: TExpressionNode; Depth: Integer);
+procedure TAstInterpreterVisitor.Resolve(Expr: TExpressionNode; Depth: Integer);
 begin
   FLocals.AddOrSetValue(Expr, Depth);
 end;
 
-procedure TInterpreter.ExecuteBlock(Statements: TObjectList<TStatementNode>;
-  Environment: TEnvironment);
+procedure TAstInterpreterVisitor.ExecuteBlock(Statements: TObjectList<TStatementNode>; Environment: TEnvironment);
 var
   PreviousEnvironment: TEnvironment;
   Statement: TStatementNode;
@@ -753,7 +702,7 @@ begin
 
 end;
 
-procedure TInterpreter.Interpret(Statements: TObjectList<TStatementNode>);
+procedure TAstInterpreterVisitor.Interpret(Statements: TObjectList<TStatementNode>);
 var
   Statement: TStatementNode;
 begin
@@ -764,28 +713,27 @@ begin
       Execute(Statement);
 
   except
-    on E: ERuntimeError do
+    on E: ELoxRuntimeError do
       RuntimeError(E);
   end;
 end;
 
-function TInterpreter.Visit(PrintStatement: TPrintStatementNode): TLoxValue;
+function TAstInterpreterVisitor.Visit(PrintStatement: TPrintStatementNode): TLoxValue;
 var
   Value: TLoxValue;
 begin
   Value := Evaluate(PrintStatement.Expr);
   Writeln(Stringify(Value));
 
-  Result := Default (TLoxValue);
+  Result := default(TLoxValue);
   Result.ValueType := TLoxValueType.IS_NULL;
 end;
 
-function TInterpreter.Visit(ExpressionStatement: TExpressionStatementNode)
-  : TLoxValue;
+function TAstInterpreterVisitor.Visit(ExpressionStatement: TExpressionStatementNode): TLoxValue;
 begin
   Evaluate(ExpressionStatement.Expression);
 
-  Result := Default (TLoxValue);
+  Result := default(TLoxValue);
   Result.ValueType := TLoxValueType.IS_NULL;
 end;
 
@@ -796,8 +744,7 @@ begin
   Result := 0;
 end;
 
-function TClockFunction.Call(interpreter: TInterpreter;
-  Arguments: TList<TLoxValue>): TLoxValue;
+function TClockFunction.Call(interpreter: TAstInterpreterVisitor; Arguments: TList<TLoxValue>): TLoxValue;
 begin
   Result.ValueType := TLoxValueType.IS_INT32;
   Result.Int32Value := MillisecondOfTheDay(Now);
@@ -815,8 +762,7 @@ begin
   Result := FDeclaration.Params.Count;
 end;
 
-function TCallableFunction.Call(interpreter: TInterpreter;
-  Arguments: TList<TLoxValue>): TLoxValue;
+function TCallableFunction.Call(interpreter: TAstInterpreterVisitor; Arguments: TList<TLoxValue>): TLoxValue;
 var
   Environment: TEnvironment;
   i: Integer;
@@ -845,12 +791,11 @@ begin
   if (FIsInitializer) then
     Exit(FClosure.GetAt(0, 'this'));
 
-  Result := Default (TLoxValue);
+  Result := default(TLoxValue);
   Result.ValueType := TLoxValueType.IS_NULL;
 end;
 
-constructor TCallableFunction.Create(Declaration: TFunctionStatementNode;
-  Closure: TEnvironment; IsInitializer: Boolean);
+constructor TCallableFunction.Create(Declaration: TFunctionStatementNode; Closure: TEnvironment; IsInitializer: Boolean);
 begin
   FDeclaration := Declaration;
   FClosure := Closure;
@@ -862,17 +807,16 @@ var
   Environment: TEnvironment;
   Value: TLoxValue;
 begin
-  Value := Default (TLoxValue);
+  Value := default(TLoxValue);
   Value.ValueType := TLoxValueType.IS_OBJECT;
   Value.ObjectInstanceValue := Instance;
 
   Environment := TEnvironment.Create(FClosure);
   Environment.Define('this', Value);
 
-  Value := Default (TLoxValue);
+  Value := default(TLoxValue);
   Value.ValueType := TLoxValueType.IS_METHOD;
-  Value.MethodValue := TCallableFunction.Create(FDeclaration, Environment,
-    FIsInitializer);
+  Value.MethodValue := TCallableFunction.Create(FDeclaration, Environment, FIsInitializer);
 
   Result := Value;
 end;
@@ -892,7 +836,7 @@ end;
 
 { TLoxClass }
 
-function TLoxClass.Arity: Integer;
+function TLoxClass.Arity(): Integer;
 var
   Initializer: TCallableFunction;
 begin
@@ -903,26 +847,23 @@ begin
     Result := 0;
 end;
 
-function TLoxClass.Call(interpreter: TInterpreter;
-  Arguments: TList<TLoxValue>): TLoxValue;
+function TLoxClass.Call(Interpreter: TAstInterpreterVisitor; Arguments: TList<TLoxValue>): TLoxValue;
 var
   ObjectValue: TLoxValue;
   Initializer: TCallableFunction;
 begin
-  ObjectValue := Default (TLoxValue);
+  ObjectValue := default(TLoxValue);
   ObjectValue.ValueType := TLoxValueType.IS_OBJECT;
   ObjectValue.ObjectInstanceValue := TLoxObjectInstance.Create(Self);
 
   Initializer := FindMethod('init');
   if Assigned(Initializer) then
-    TCallableFunction(Initializer.Bind(ObjectValue.ObjectInstanceValue)
-      .MethodValue).Call(interpreter, Arguments);
+    TCallableFunction(Initializer.Bind(ObjectValue.ObjectInstanceValue).MethodValue).Call(Interpreter, Arguments);
 
   Result := ObjectValue;
 end;
 
-constructor TLoxClass.Create(Name: string; Superclass: TLoxValue;
-  Methods: TDictionary<string, TCallableFunction>);
+constructor TLoxClass.Create(Name: string; Superclass: TLoxValue; Methods: TDictionary<string, TCallableFunction>);
 begin
   FName := Name;
   FMethods := Methods;
@@ -933,8 +874,7 @@ function TLoxClass.FindMethod(Name: string): TCallableFunction;
 begin
   if (FMethods.ContainsKey(Name)) then
     Result := FMethods[Name]
-  else if FSuperclass.ValueType in [TLoxValueType.IS_CLASS,
-    TLoxValueType.IS_OBJECT] then
+  else if FSuperclass.ValueType in [TLoxValueType.IS_CLASS, TLoxValueType.IS_OBJECT] then
     Result := TLoxClass(FSuperclass.ClassValue).FindMethod(Name)
   else
     Result := nil;
@@ -958,7 +898,7 @@ begin
   Result := FClass.Name + ' instance';
 end;
 
-function TLoxObjectInstance.GetValue(Name: TToken): TLoxValue;
+function TLoxObjectInstance.GetValue(Name: TLoxToken): TLoxValue;
 var
   Method: TCallableFunction;
 begin
@@ -972,14 +912,14 @@ begin
     Exit();
   end;
 
-  raise ERuntimeError.Create(Name, 'Propriedade indefinida "' +
-    name.Lexeme + '".');
+  raise ELoxRuntimeError.Create(Name, 'Propriedade indefinida "' + Name.Lexeme + '".');
 
 end;
 
-procedure TLoxObjectInstance.SetValue(Name: TToken; Value: TLoxValue);
+procedure TLoxObjectInstance.SetValue(Name: TLoxToken; Value: TLoxValue);
 begin
   FFields.AddOrSetValue(Name.Lexeme, Value);
 end;
 
 end.
+

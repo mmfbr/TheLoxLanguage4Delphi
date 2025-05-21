@@ -14,7 +14,7 @@ uses
 
 type
 
-  TTokenType = (
+  TLoxTokenType = (
     // Tokens de caractere único
     LEFT_PAREN_SYMBOL,
     RIGHT_PAREN_SYMBOL,
@@ -68,8 +68,8 @@ type
     END_OF_FILE_TOKEN
   );
 
-  TFunctionType = (NONE, &FUNCTION, INITIALIZER, METHOD);
-  TClassType = (NONE, &CLASS, SUBCLASS);
+  TLoxFunctionType = (NONE, &FUNCTION, INITIALIZER, METHOD);
+  TLoxClassType = (NONE, &CLASS, SUBCLASS);
 
   TLoxValueType = (
     IS_UNDEF     = 0,
@@ -108,31 +108,31 @@ type
       9: (MethodValue: TLoxMethodValue);
   end;
 
-  TToken = class
+  TLoxToken = class
   private
-    FTokenType: TTokenType;
+    FTokenType: TLoxTokenType;
     FLexeme: string;
     FLiteral: TLoxValue;
     FLineNro: Integer;
   public
-    constructor Create(TokenType: TTokenType; Lexeme: string; Literal: TLoxValue; LineNro: Integer);
+    constructor Create(TokenType: TLoxTokenType; Lexeme: string; Literal: TLoxValue; LineNro: Integer);
     function ToString(): string; override;
-    property TokenType: TTokenType read FTokenType;
+    property TokenType: TLoxTokenType read FTokenType;
     property Lexeme: string read FLexeme;
     property Literal: TLoxValue read FLiteral;
     property LineNro: Integer read FLineNro;
   end;
 
-  ERuntimeError = class(Exception)
+  ELoxRuntimeError = class(Exception)
   private
-    FToken: TToken;
+    FToken: TLoxToken;
   public
-    constructor Create(Token: TToken; Msg: string);
-    property Token: TToken read FToken;
+    constructor Create(Token: TLoxToken; Msg: string);
+    property Token: TLoxToken read FToken;
   end;
 
 var
-  Keywords: TDictionary<string, TTokenType>;
+  LoxReservedKeywords: TDictionary<string, TLoxTokenType>;
 
 implementation
 
@@ -141,7 +141,7 @@ uses
 
 { TToken }
 
-constructor TToken.Create(TokenType: TTokenType; Lexeme: string; Literal: TLoxValue; LineNro: Integer);
+constructor TLoxToken.Create(TokenType: TLoxTokenType; Lexeme: string; Literal: TLoxValue; LineNro: Integer);
 begin
   FTokenType := TokenType;
   FLexeme := Lexeme;
@@ -149,7 +149,7 @@ begin
   FLineNro := LineNro;
 end;
 
-function TToken.ToString: string;
+function TLoxToken.ToString: string;
 var
   StrValue: string;
 begin
@@ -160,14 +160,14 @@ begin
     StrValue := '';
 
   Result := Format('%s %s %s',
-                   [TEnumConversor<TTokenType>.ToString(FTokenType),
+                   [TEnumConversor<TLoxTokenType>.ToString(FTokenType),
                    FLexeme,
                    StrValue]);
 end;
 
 { ERuntimeError }
 
-constructor ERuntimeError.Create(Token: TToken; Msg: string);
+constructor ELoxRuntimeError.Create(Token: TLoxToken; Msg: string);
 begin
   inherited Create(Msg);
   FToken := Token;
@@ -176,29 +176,29 @@ end;
 { TLoxValue }
 
 initialization
-  Keywords := TDictionary<string, TTokenType>.Create();
-  keywords.Add('and',    TTokenType.AND_KEYWORD);
-  keywords.Add('break',  TTokenType.BREAK_KEYWORD);
-  keywords.Add('class',  TTokenType.CLASS_KEYWORD);
-  keywords.Add('continue',  TTokenType.CONTINUE_KEYWORD);
-  keywords.Add('do',  TTokenType.DO_KEYWORD);
-  keywords.Add('else',   TTokenType.ELSE_KEYWORD);
-  keywords.Add('false',  TTokenType.FALSE_KEYWORD);
-  keywords.Add('for',    TTokenType.FOR_KEYWORD);
-  keywords.Add('fun',    TTokenType.FUN_KEYWORD);
-  keywords.Add('if',     TTokenType.IF_KEYWORD);
-  keywords.Add('nil',    TTokenType.NIL_KEYWORD);
-  keywords.Add('or',     TTokenType.OR_KEYWORD);
-  keywords.Add('print',  TTokenType.PRINT_KEYWORD);
-  keywords.Add('return', TTokenType.RETURN_KEYWORD);
-  keywords.Add('super',  TTokenType.SUPER_KEYWORD);
-  keywords.Add('this',   TTokenType.THIS_KEYWORD);
-  keywords.Add('true',   TTokenType.TRUE_KEYWORD);
-  keywords.Add('var',    TTokenType.VAR_KEYWORD);
-  keywords.Add('while',  TTokenType.WHILE_KEYWORD);
+  LoxReservedKeywords := TDictionary<string, TLoxTokenType>.Create();
+  LoxReservedKeywords.Add('and',    TLoxTokenType.AND_KEYWORD);
+  LoxReservedKeywords.Add('break',  TLoxTokenType.BREAK_KEYWORD);
+  LoxReservedKeywords.Add('class',  TLoxTokenType.CLASS_KEYWORD);
+  LoxReservedKeywords.Add('continue',  TLoxTokenType.CONTINUE_KEYWORD);
+  LoxReservedKeywords.Add('do',  TLoxTokenType.DO_KEYWORD);
+  LoxReservedKeywords.Add('else',   TLoxTokenType.ELSE_KEYWORD);
+  LoxReservedKeywords.Add('false',  TLoxTokenType.FALSE_KEYWORD);
+  LoxReservedKeywords.Add('for',    TLoxTokenType.FOR_KEYWORD);
+  LoxReservedKeywords.Add('fun',    TLoxTokenType.FUN_KEYWORD);
+  LoxReservedKeywords.Add('if',     TLoxTokenType.IF_KEYWORD);
+  LoxReservedKeywords.Add('nil',    TLoxTokenType.NIL_KEYWORD);
+  LoxReservedKeywords.Add('or',     TLoxTokenType.OR_KEYWORD);
+  LoxReservedKeywords.Add('print',  TLoxTokenType.PRINT_KEYWORD);
+  LoxReservedKeywords.Add('return', TLoxTokenType.RETURN_KEYWORD);
+  LoxReservedKeywords.Add('super',  TLoxTokenType.SUPER_KEYWORD);
+  LoxReservedKeywords.Add('this',   TLoxTokenType.THIS_KEYWORD);
+  LoxReservedKeywords.Add('true',   TLoxTokenType.TRUE_KEYWORD);
+  LoxReservedKeywords.Add('var',    TLoxTokenType.VAR_KEYWORD);
+  LoxReservedKeywords.Add('while',  TLoxTokenType.WHILE_KEYWORD);
 
 finalization
-  Keywords.Free();
+  LoxReservedKeywords.Free();
 
 
 end.

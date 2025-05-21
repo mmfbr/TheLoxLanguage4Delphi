@@ -23,17 +23,17 @@ uses
 
 var
 //  Expression: TBinaryExpression;
-  AstPrinter: IVisitor;
+  AstPrinter: IAstVisitor;
   source: string;
 
   Scanner: TScanner;
-  Tokens: TObjectList<TToken>;
+  Tokens: TObjectList<TLoxToken>;
   Parser: TParser;
-  Statements: TObjectList<TStatement>;
+  Statements: TObjectList<TStatementNode>;
 //  Interpreter: IVisitor;
 //  Resolver: IVisitor;
   HadError: Boolean;
-  Statement: TStatement;
+  Statement: TStatementNode;
 begin
   source := '                                                              ' + sLineBreak +
             '                                                              ' + sLineBreak +
@@ -93,7 +93,7 @@ begin
   if (HadError) then
     Halt(64);
 
-  AstPrinter := TAstPrinter.Create();
+  AstPrinter := TAstPrinterVisitor.Create();
 
   for Statement in Statements do
   begin
