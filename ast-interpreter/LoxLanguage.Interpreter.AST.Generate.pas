@@ -131,7 +131,7 @@ begin
   Writer.Add('//                                                                               ');
   Writer.Add('//               The Lox Language - Abstract Syntax Tree                         ');
   Writer.Add('//                                                                               ');
-  Writer.Add('// ESSE ARQUIVO É GERADO DE FORMA AUTOMATICA PELO PROGRAMA "GenerateApp.exe"     ');
+  Writer.Add('// ESSE ARQUIVO É GERADO DE FORMA AUTOMATICA PELO PROGRAMA "GenerateApp"         ');
   Writer.Add('//                                                                               ');
   Writer.Add('// GenerateApp: ' + ExtractFileName(ParamStr(0)));
   Writer.Add('// Data: ' + DateTimeToStr(Now()));

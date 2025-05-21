@@ -3,7 +3,7 @@
 // LPS (Linguagem de programação Se7e)
 // Lets go
 
-program LoxLanguage.Interpreter.ConsoleApp;
+program LoxInterpreter;
 
 {$APPTYPE CONSOLE}
 

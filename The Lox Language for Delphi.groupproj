@@ -3,7 +3,7 @@
         <ProjectGuid>{F617262D-6047-4D92-A7EB-00025AA28C51}</ProjectGuid>
     </PropertyGroup>
     <ItemGroup>
-        <Projects Include="ast-interpreter\LoxLanguage.Interpreter.ConsoleApp.dproj">
+        <Projects Include="ast-interpreter\LoxInterpreter.dproj">
             <Dependencies/>
         </Projects>
         <Projects Include="ast-interpreter\tool\LoxLanguage.Interpreter.AST.GenerateApp.dproj">
@@ -12,7 +12,7 @@
         <Projects Include="ast-interpreter\tool\LoxLanguage.Interpreter.AST.PrinterApp.dproj">
             <Dependencies/>
         </Projects>
-        <Projects Include="vm-compiler\LoxLanguage.VirtualMachine.RunApp.dproj">
+        <Projects Include="vm-compiler\LoxVM.dproj">
             <Dependencies/>
         </Projects>
         <Projects Include="IDE\LoxIDE.dproj">
@@ -26,14 +26,14 @@
             <Default.Personality/>
         </BorlandProject>
     </ProjectExtensions>
-    <Target Name="LoxLanguage_Interpreter_ConsoleApp">
-        <MSBuild Projects="ast-interpreter\LoxLanguage.Interpreter.ConsoleApp.dproj"/>
+    <Target Name="LoxInterpreter">
+        <MSBuild Projects="ast-interpreter\LoxInterpreter.dproj"/>
     </Target>
-    <Target Name="LoxLanguage_Interpreter_ConsoleApp:Clean">
-        <MSBuild Projects="ast-interpreter\LoxLanguage.Interpreter.ConsoleApp.dproj" Targets="Clean"/>
+    <Target Name="LoxInterpreter:Clean">
+        <MSBuild Projects="ast-interpreter\LoxInterpreter.dproj" Targets="Clean"/>
     </Target>
-    <Target Name="LoxLanguage_Interpreter_ConsoleApp:Make">
-        <MSBuild Projects="ast-interpreter\LoxLanguage.Interpreter.ConsoleApp.dproj" Targets="Make"/>
+    <Target Name="LoxInterpreter:Make">
+        <MSBuild Projects="ast-interpreter\LoxInterpreter.dproj" Targets="Make"/>
     </Target>
     <Target Name="LoxLanguage_Interpreter_AST_GenerateApp">
         <MSBuild Projects="ast-interpreter\tool\LoxLanguage.Interpreter.AST.GenerateApp.dproj"/>
@@ -53,14 +53,14 @@
     <Target Name="LoxLanguage_Interpreter_AST_PrinterApp:Make">
         <MSBuild Projects="ast-interpreter\tool\LoxLanguage.Interpreter.AST.PrinterApp.dproj" Targets="Make"/>
     </Target>
-    <Target Name="LoxLanguage_VirtualMachine_RunApp">
-        <MSBuild Projects="vm-compiler\LoxLanguage.VirtualMachine.RunApp.dproj"/>
+    <Target Name="LoxVM">
+        <MSBuild Projects="vm-compiler\LoxVM.dproj"/>
     </Target>
-    <Target Name="LoxLanguage_VirtualMachine_RunApp:Clean">
-        <MSBuild Projects="vm-compiler\LoxLanguage.VirtualMachine.RunApp.dproj" Targets="Clean"/>
+    <Target Name="LoxVM:Clean">
+        <MSBuild Projects="vm-compiler\LoxVM.dproj" Targets="Clean"/>
     </Target>
-    <Target Name="LoxLanguage_VirtualMachine_RunApp:Make">
-        <MSBuild Projects="vm-compiler\LoxLanguage.VirtualMachine.RunApp.dproj" Targets="Make"/>
+    <Target Name="LoxVM:Make">
+        <MSBuild Projects="vm-compiler\LoxVM.dproj" Targets="Make"/>
     </Target>
     <Target Name="LoxIDE">
         <MSBuild Projects="IDE\LoxIDE.dproj"/>
@@ -72,13 +72,13 @@
         <MSBuild Projects="IDE\LoxIDE.dproj" Targets="Make"/>
     </Target>
     <Target Name="Build">
-        <CallTarget Targets="LoxLanguage_Interpreter_ConsoleApp;LoxLanguage_Interpreter_AST_GenerateApp;LoxLanguage_Interpreter_AST_PrinterApp;LoxLanguage_VirtualMachine_RunApp;LoxIDE"/>
+        <CallTarget Targets="LoxInterpreter;LoxLanguage_Interpreter_AST_GenerateApp;LoxLanguage_Interpreter_AST_PrinterApp;LoxVM;LoxIDE"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="LoxLanguage_Interpreter_ConsoleApp:Clean;LoxLanguage_Interpreter_AST_GenerateApp:Clean;LoxLanguage_Interpreter_AST_PrinterApp:Clean;LoxLanguage_VirtualMachine_RunApp:Clean;LoxIDE:Clean"/>
+        <CallTarget Targets="LoxInterpreter:Clean;LoxLanguage_Interpreter_AST_GenerateApp:Clean;LoxLanguage_Interpreter_AST_PrinterApp:Clean;LoxVM:Clean;LoxIDE:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="LoxLanguage_Interpreter_ConsoleApp:Make;LoxLanguage_Interpreter_AST_GenerateApp:Make;LoxLanguage_Interpreter_AST_PrinterApp:Make;LoxLanguage_VirtualMachine_RunApp:Make;LoxIDE:Make"/>
+        <CallTarget Targets="LoxInterpreter:Make;LoxLanguage_Interpreter_AST_GenerateApp:Make;LoxLanguage_Interpreter_AST_PrinterApp:Make;LoxVM:Make;LoxIDE:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>
