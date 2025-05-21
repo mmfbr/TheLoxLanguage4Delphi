@@ -29,42 +29,42 @@ type
     FScopes: TObjectStack<TDictionary<string, Boolean>>;
     FOnError: TOnResolverErrorEvent;
     procedure BeginScope;
-    procedure Resolve(Expr: TExpression); overload;
-    procedure Resolve(Statement: TStatement); overload;
+    procedure Resolve(Expr: TExpressionNode); overload;
+    procedure Resolve(Statement: TStatementNode); overload;
     procedure EndScope();
     procedure Declare(Name: TToken);
     procedure Define(Name: TToken);
     function Error(Token: TToken; Msg: string): EResolverError;
-    procedure ResolveLocal(Expr: TExpression; Name: TToken);
-    procedure ResolveFunction(FunctionStatement: TFunctionStatement; FunctionType: TFunctionType);
+    procedure ResolveLocal(Expr: TExpressionNode; Name: TToken);
+    procedure ResolveFunction(FunctionStatement: TFunctionStatementNode; FunctionType: TFunctionType);
   private
-    function Visit(AssignExpression: TAssignExpression): TLoxValue; overload;
-    function Visit(BinaryExpression: TBinaryExpression): TLoxValue; overload;
-    function Visit(CallExpression: TCallExpression): TLoxValue; overload;
-    function Visit(GetExpression: TGetExpression): TLoxValue; overload;
-    function Visit(GroupingExpression: TGroupingExpression): TLoxValue; overload;
-    function Visit(LiteralExpression: TLiteralExpression): TLoxValue; overload;
-    function Visit(LogicalExpression: TLogicalExpression): TLoxValue; overload;
-    function Visit(SetExpression: TSetExpression): TLoxValue; overload;
-    function Visit(SuperExpression: TSuperExpression): TLoxValue; overload;
-    function Visit(ThisExpression: TThisExpression): TLoxValue; overload;
-    function Visit(UnaryExpression: TUnaryExpression): TLoxValue; overload;
-    function Visit(VariableExpression: TVariableExpression): TLoxValue; overload;
-    function Visit(BlockStatement: TBlockStatement): TLoxValue; overload;
-    function Visit(BreakStatement: TBreakStatement): TLoxValue; overload;
-    function Visit(ContinueStatement: TContinueStatement): TLoxValue; overload;
-    function Visit(ExpressionStatement: TExpressionStatement): TLoxValue; overload;
-    function Visit(IfStatement: TIfStatement): TLoxValue; overload;
-    function Visit(FunctionStatement: TFunctionStatement): TLoxValue; overload;
-    function Visit(PrintStatement: TPrintStatement): TLoxValue; overload;
-    function Visit(ClassStatement: TClassStatement): TLoxValue; overload;
-    function Visit(ReturnStatement: TReturnStatement): TLoxValue; overload;
-    function Visit(VarStatement: TVarStatement): TLoxValue; overload;
-    function Visit(WhileStatement: TWhileStatement): TLoxValue; overload;
+    function Visit(AssignExpression: TAssignExpressionNode): TLoxValue; overload;
+    function Visit(BinaryExpression: TBinaryExpressionNode): TLoxValue; overload;
+    function Visit(CallExpression: TCallExpressionNode): TLoxValue; overload;
+    function Visit(GetExpression: TGetExpressionNode): TLoxValue; overload;
+    function Visit(GroupingExpression: TGroupingExpressionNode): TLoxValue; overload;
+    function Visit(LiteralExpression: TLiteralExpressionNode): TLoxValue; overload;
+    function Visit(LogicalExpression: TLogicalExpressionNode): TLoxValue; overload;
+    function Visit(SetExpression: TSetExpressionNode): TLoxValue; overload;
+    function Visit(SuperExpression: TSuperExpressionNode): TLoxValue; overload;
+    function Visit(ThisExpression: TThisExpressionNode): TLoxValue; overload;
+    function Visit(UnaryExpression: TUnaryExpressionNode): TLoxValue; overload;
+    function Visit(VariableExpression: TVariableExpressionNode): TLoxValue; overload;
+    function Visit(BlockStatement: TBlockStatementNode): TLoxValue; overload;
+    function Visit(BreakStatement: TBreakStatementNode): TLoxValue; overload;
+    function Visit(ContinueStatement: TContinueStatementNode): TLoxValue; overload;
+    function Visit(ExpressionStatement: TExpressionStatementNode): TLoxValue; overload;
+    function Visit(IfStatement: TIfStatementNode): TLoxValue; overload;
+    function Visit(FunctionStatement: TFunctionStatementNode): TLoxValue; overload;
+    function Visit(PrintStatement: TPrintStatementNode): TLoxValue; overload;
+    function Visit(ClassStatement: TClassStatementNode): TLoxValue; overload;
+    function Visit(ReturnStatement: TReturnStatementNode): TLoxValue; overload;
+    function Visit(VarStatement: TVarStatementNode): TLoxValue; overload;
+    function Visit(WhileStatement: TWhileStatementNode): TLoxValue; overload;
   public
     constructor Create(Interpreter: TInterpreter);
     destructor Destroy; override;
-    procedure Resolve(Statements: TObjectList<TStatement>); overload;
+    procedure Resolve(Statements: TObjectList<TStatementNode>); overload;
     property OnError: TOnResolverErrorEvent read FOnError write FOnError;
   end;
 
@@ -72,13 +72,13 @@ implementation
 
 { TResolver }
 
-function TResolver.Visit(LiteralExpression: TLiteralExpression): TLoxValue;
+function TResolver.Visit(LiteralExpression: TLiteralExpressionNode): TLoxValue;
 begin
   Result := Default(TLoxValue);
   Result.ValueType := TLoxValueType.IS_NULL;
 end;
 
-function TResolver.Visit(LogicalExpression: TLogicalExpression): TLoxValue;
+function TResolver.Visit(LogicalExpression: TLogicalExpressionNode): TLoxValue;
 begin
   Resolve(LogicalExpression.Left);
   Resolve(LogicalExpression.Right);
@@ -87,7 +87,7 @@ begin
   Result.ValueType := TLoxValueType.IS_NULL;
 end;
 
-function TResolver.Visit(UnaryExpression: TUnaryExpression): TLoxValue;
+function TResolver.Visit(UnaryExpression: TUnaryExpressionNode): TLoxValue;
 begin
   Resolve(UnaryExpression.Right);
 
@@ -103,7 +103,7 @@ begin
   Result := EResolverError.Create(Msg);
 end;
 
-function TResolver.Visit(VariableExpression: TVariableExpression): TLoxValue;
+function TResolver.Visit(VariableExpression: TVariableExpressionNode): TLoxValue;
 begin
   if (not FScopes.Count = 0) and (FScopes.peek()[VariableExpression.Name.Lexeme] = False) then
     Error(VariableExpression.Name, 'Não é possível ler a variável local em seu próprio inicializador.');
@@ -114,7 +114,7 @@ begin
   Result.ValueType := TLoxValueType.IS_NULL;
 end;
 
-procedure TResolver.ResolveLocal(Expr: TExpression; Name: TToken);
+procedure TResolver.ResolveLocal(Expr: TExpressionNode; Name: TToken);
 var
   i: Integer;
 begin
@@ -131,7 +131,7 @@ begin
   // Não encontrado. Suponha que seja global.
 end;
 
-function TResolver.Visit(AssignExpression: TAssignExpression): TLoxValue;
+function TResolver.Visit(AssignExpression: TAssignExpressionNode): TLoxValue;
 begin
   Resolve(AssignExpression.value);
   ResolveLocal(AssignExpression, AssignExpression.name);
@@ -140,7 +140,7 @@ begin
   Result.ValueType := TLoxValueType.IS_NULL;
 end;
 
-function TResolver.Visit(BinaryExpression: TBinaryExpression): TLoxValue;
+function TResolver.Visit(BinaryExpression: TBinaryExpressionNode): TLoxValue;
 begin
   Resolve(BinaryExpression.Left);
   Resolve(BinaryExpression.Right);
@@ -149,9 +149,9 @@ begin
   Result.ValueType := TLoxValueType.IS_NULL;
 end;
 
-function TResolver.Visit(CallExpression: TCallExpression): TLoxValue;
+function TResolver.Visit(CallExpression: TCallExpressionNode): TLoxValue;
 var
-  Argument: TExpression;
+  Argument: TExpressionNode;
 begin
   Resolve(CallExpression.Callee);
 
@@ -162,7 +162,7 @@ begin
   Result.ValueType := TLoxValueType.IS_NULL;
 end;
 
-function TResolver.Visit(GroupingExpression: TGroupingExpression): TLoxValue;
+function TResolver.Visit(GroupingExpression: TGroupingExpressionNode): TLoxValue;
 begin
   Resolve(GroupingExpression.Expr);
 
@@ -170,7 +170,7 @@ begin
   Result.ValueType := TLoxValueType.IS_NULL;
 end;
 
-function TResolver.Visit(PrintStatement: TPrintStatement): TLoxValue;
+function TResolver.Visit(PrintStatement: TPrintStatementNode): TLoxValue;
 begin
   Resolve(PrintStatement.Expr);
 
@@ -178,7 +178,7 @@ begin
   Result.ValueType := TLoxValueType.IS_NULL;
 end;
 
-function TResolver.Visit(ReturnStatement: TReturnStatement): TLoxValue;
+function TResolver.Visit(ReturnStatement: TReturnStatementNode): TLoxValue;
 begin
   if (FCurrentFunction = TFunctionType.NONE) then
     Error(ReturnStatement.Keyword, 'Não é possível retornar do código de nível superior.');
@@ -222,7 +222,7 @@ begin
   Scope.AddOrSetValue(Name.Lexeme, True);
 end;
 
-function TResolver.Visit(VarStatement: TVarStatement): TLoxValue;
+function TResolver.Visit(VarStatement: TVarStatementNode): TLoxValue;
 begin
   Declare(VarStatement.Name);
 
@@ -250,7 +250,7 @@ begin
   inherited;
 end;
 
-function TResolver.Visit(WhileStatement: TWhileStatement): TLoxValue;
+function TResolver.Visit(WhileStatement: TWhileStatementNode): TLoxValue;
 begin
   Resolve(WhileStatement.Condition);
   Resolve(WhileStatement.Body);
@@ -259,19 +259,19 @@ begin
   Result.ValueType := TLoxValueType.IS_NULL;
 end;
 
-function TResolver.Visit(ContinueStatement: TContinueStatement): TLoxValue;
+function TResolver.Visit(ContinueStatement: TContinueStatementNode): TLoxValue;
 begin
   Result := Default(TLoxValue);
   Result.ValueType := TLoxValueType.IS_NULL;
 end;
 
-function TResolver.Visit(BreakStatement: TBreakStatement): TLoxValue;
+function TResolver.Visit(BreakStatement: TBreakStatementNode): TLoxValue;
 begin
   Result := Default(TLoxValue);
   Result.ValueType := TLoxValueType.IS_NULL;
 end;
 
-function TResolver.Visit(SuperExpression: TSuperExpression): TLoxValue;
+function TResolver.Visit(SuperExpression: TSuperExpressionNode): TLoxValue;
 begin
   if (FCurrentClass = TClassType.NONE) then
     Error(SuperExpression.Keyword, 'Não é possível usar "super" fora de uma classe.')
@@ -284,7 +284,7 @@ begin
   Result.ValueType := TLoxValueType.IS_NULL;
 end;
 
-function TResolver.Visit(ThisExpression: TThisExpression): TLoxValue;
+function TResolver.Visit(ThisExpression: TThisExpressionNode): TLoxValue;
 begin
   if (FCurrentClass = TClassType.NONE) then
   begin
@@ -301,7 +301,7 @@ begin
   Result.ValueType := TLoxValueType.IS_NULL;
 end;
 
-function TResolver.Visit(SetExpression: TSetExpression): TLoxValue;
+function TResolver.Visit(SetExpression: TSetExpressionNode): TLoxValue;
 begin
   Resolve(SetExpression.Value);
   Resolve(SetExpression.Obj);
@@ -310,7 +310,7 @@ begin
   Result.ValueType := TLoxValueType.IS_NULL;
 end;
 
-function TResolver.Visit(GetExpression: TGetExpression): TLoxValue;
+function TResolver.Visit(GetExpression: TGetExpressionNode): TLoxValue;
 begin
   Resolve(GetExpression.Obj);
 
@@ -318,9 +318,9 @@ begin
   Result.ValueType := TLoxValueType.IS_NULL;
 end;
 
-function TResolver.Visit(ClassStatement: TClassStatement): TLoxValue;
+function TResolver.Visit(ClassStatement: TClassStatementNode): TLoxValue;
 var
-  Method: TFunctionStatement;
+  Method: TFunctionStatementNode;
   Declaration: TFunctionType;
   EnclosingClass: TClassType;
 begin
@@ -375,17 +375,17 @@ begin
   FScopes.Pop();
 end;
 
-procedure TResolver.Resolve(Expr: TExpression);
+procedure TResolver.Resolve(Expr: TExpressionNode);
 begin
   Expr.Accept(Self);
 end;
 
-procedure TResolver.Resolve(Statement: TStatement);
+procedure TResolver.Resolve(Statement: TStatementNode);
 begin
   Statement.Accept(Self);
 end;
 
-function TResolver.Visit(BlockStatement: TBlockStatement): TLoxValue;
+function TResolver.Visit(BlockStatement: TBlockStatementNode): TLoxValue;
 begin
   BeginScope();
   Resolve(BlockStatement.Statements);
@@ -395,9 +395,9 @@ begin
   Result.ValueType := TLoxValueType.IS_NULL;
 end;
 
-procedure TResolver.Resolve(Statements: TObjectList<TStatement>);
+procedure TResolver.Resolve(Statements: TObjectList<TStatementNode>);
 var
-  Statement: TStatement;
+  Statement: TStatementNode;
 begin
   for Statement in Statements do
     Resolve(Statement);
@@ -411,7 +411,7 @@ begin
   FScopes.Push(Item);
 end;
 
-function TResolver.Visit(ExpressionStatement: TExpressionStatement): TLoxValue;
+function TResolver.Visit(ExpressionStatement: TExpressionStatementNode): TLoxValue;
 begin
   Resolve(ExpressionStatement.Expression);
 
@@ -419,7 +419,7 @@ begin
   Result.ValueType := TLoxValueType.IS_NULL;
 end;
 
-function TResolver.Visit(IfStatement: TIfStatement): TLoxValue;
+function TResolver.Visit(IfStatement: TIfStatementNode): TLoxValue;
 begin
   Resolve(IfStatement.Condition);
   Resolve(IfStatement.ThenBranch);
@@ -431,7 +431,7 @@ begin
   Result.ValueType := TLoxValueType.IS_NULL;
 end;
 
-function TResolver.Visit(FunctionStatement: TFunctionStatement): TLoxValue;
+function TResolver.Visit(FunctionStatement: TFunctionStatementNode): TLoxValue;
 begin
   Declare(FunctionStatement.name);
   Define(FunctionStatement.name);
@@ -442,7 +442,7 @@ begin
   Result.ValueType := TLoxValueType.IS_NULL;
 end;
 
-procedure TResolver.ResolveFunction(FunctionStatement: TFunctionStatement; FunctionType: TFunctionType);
+procedure TResolver.ResolveFunction(FunctionStatement: TFunctionStatementNode; FunctionType: TFunctionType);
 var
   Param: TToken;
   EnclosingFunction: TFunctionType;

@@ -64,7 +64,7 @@ var
   Scanner: TScanner;
   Tokens: TObjectList<TToken>;
   Parser: TParser;
-  Statements: TObjectList<TStatement>;
+  Statements: TObjectList<TStatementNode>;
   Interpreter: IVisitor;
   Resolver: IVisitor;
 begin

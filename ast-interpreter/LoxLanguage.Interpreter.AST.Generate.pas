@@ -189,7 +189,7 @@ begin
   Writer.Add('end.');
 
   OutputFile := OutputDir + Format('\%s.pas', [TARGET_UNIT_NAME]);
-  Writer.SaveToFile(OutputFile);
+  Writer.SaveToFile(OutputFile, TEncoding.UTF8);
   Writer.Free();
 
 end;

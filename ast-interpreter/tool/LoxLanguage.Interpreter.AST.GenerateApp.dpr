@@ -32,30 +32,30 @@ begin
   AstGrupos := TObjectList<TAstGrupo>.Create();
 
   ExprGrupo := TAstGrupo.Create();
-  ExprGrupo.Nome := 'Expression';
+  ExprGrupo.Nome := 'ExpressionNode';
 
   AstItem := TAstItem.Create();
   AstItem.Name := 'TAssign';
-  AstItem.Fields := 'Name: TToken; Value: TExpression';
+  AstItem.Fields := 'Name: TToken; Value: TExpressionNode';
   ExprGrupo.Items.Add(AstItem);
   AstItem := TAstItem.Create();
   AstItem.Name := 'TBinary';
-  AstItem.Fields := 'Left: TExpression; Operador: TToken; Right: TExpression';
+  AstItem.Fields := 'Left: TExpressionNode; Operador: TToken; Right: TExpressionNode';
   ExprGrupo.Items.Add(AstItem);
 
   AstItem := TAstItem.Create();
   AstItem.Name := 'TCall';
-  AstItem.Fields := 'Callee: TExpression; Paren: TToken; Arguments: TObjectList<TExpression>';
+  AstItem.Fields := 'Callee: TExpressionNode; Paren: TToken; Arguments: TObjectList<TExpressionNode>';
   ExprGrupo.Items.Add(AstItem);
 
   AstItem := TAstItem.Create();
   AstItem.Name := 'TGet';
-  AstItem.Fields := 'Obj: TExpression; Name: TToken';
+  AstItem.Fields := 'Obj: TExpressionNode; Name: TToken';
   ExprGrupo.Items.Add(AstItem);
 
   AstItem := TAstItem.Create();
   AstItem.Name := 'TGrouping';
-  AstItem.Fields := 'Expr: TExpression';
+  AstItem.Fields := 'Expr: TExpressionNode';
   ExprGrupo.Items.Add(AstItem);
 
   AstItem := TAstItem.Create();
@@ -65,12 +65,12 @@ begin
 
   AstItem := TAstItem.Create();
   AstItem.Name := 'TLogical';
-  AstItem.Fields := 'Left: TExpression; Operador: TToken; Right: TExpression';
+  AstItem.Fields := 'Left: TExpressionNode; Operador: TToken; Right: TExpressionNode';
   ExprGrupo.Items.Add(AstItem);
 
   AstItem := TAstItem.Create();
   AstItem.Name := 'TSet';
-  AstItem.Fields := 'Obj: TExpression; Name: TToken; Value: TExpression';
+  AstItem.Fields := 'Obj: TExpressionNode; Name: TToken; Value: TExpressionNode';
   ExprGrupo.Items.Add(AstItem);
 
 
@@ -87,8 +87,9 @@ begin
 
   AstItem := TAstItem.Create();
   AstItem.Name := 'TUnary';
-  AstItem.Fields := 'Operador: TToken; Right: TExpression';
+  AstItem.Fields := 'Operador: TToken; Right: TExpressionNode';
   ExprGrupo.Items.Add(AstItem);
+
   AstItem := TAstItem.Create();
   AstItem.Name := 'TVariable';
   AstItem.Fields := 'Name: TToken';
@@ -97,11 +98,11 @@ begin
 
 
   StmtGrupo := TAstGrupo.Create();
-  StmtGrupo.Nome := 'Statement';
+  StmtGrupo.Nome := 'StatementNode';
 
   AstItem := TAstItem.Create();
   AstItem.Name := 'TBlock';
-  AstItem.Fields := 'Statements: TObjectList<TStatement>';
+  AstItem.Fields := 'Statements: TObjectList<TStatementNode>';
   StmtGrupo.Items.Add(AstItem);
 
   AstItem := TAstItem.Create();
@@ -116,38 +117,42 @@ begin
 
   AstItem := TAstItem.Create();
   AstItem.Name := 'TExpression';
-  AstItem.Fields := 'Expression: TExpression';
+  AstItem.Fields := 'Expression: TExpressionNode';
   StmtGrupo.Items.Add(AstItem);
+
   AstItem := TAstItem.Create();
   AstItem.Name := 'TIf';
-  AstItem.Fields := 'Condition: TExpression; ThenBranch: TStatement; ElseBranch: TStatement';
+  AstItem.Fields := 'Condition: TExpressionNode; ThenBranch: TStatementNode; ElseBranch: TStatementNode';
   StmtGrupo.Items.Add(AstItem);
+
   AstItem := TAstItem.Create();
   AstItem.Name := 'TFunction';
-  AstItem.Fields := 'Name: TToken; Params: TObjectList<TToken>; Body: TObjectList<TStatement>';
+  AstItem.Fields := 'Name: TToken; Params: TObjectList<TToken>; Body: TObjectList<TStatementNode>';
   StmtGrupo.Items.Add(AstItem);
+
   AstItem := TAstItem.Create();
   AstItem.Name := 'TPrint';
-  AstItem.Fields := 'Expr: TExpression';
+  AstItem.Fields := 'Expr: TExpressionNode';
   StmtGrupo.Items.Add(AstItem);
 
   AstItem := TAstItem.Create();
   AstItem.Name := 'TClass';
-  AstItem.Fields := 'Name: TToken; SuperClass: TVariableExpression; Methods: TObjectList<TFunctionStatement>';
+  AstItem.Fields := 'Name: TToken; SuperClass: TVariableExpressionNode; Methods: TObjectList<TFunctionStatementNode>';
   StmtGrupo.Items.Add(AstItem);
 
   AstItem := TAstItem.Create();
   AstItem.Name := 'TReturn';
-  AstItem.Fields := 'Keyword: TToken; Value: TExpression';
+  AstItem.Fields := 'Keyword: TToken; Value: TExpressionNode';
   StmtGrupo.Items.Add(AstItem);
 
   AstItem := TAstItem.Create();
   AstItem.Name := 'TVar';
-  AstItem.Fields := 'Name: TToken; Initializer: TExpression';
+  AstItem.Fields := 'Name: TToken; Initializer: TExpressionNode';
   StmtGrupo.Items.Add(AstItem);
+
   AstItem := TAstItem.Create();
   AstItem.Name := 'TWhile';
-  AstItem.Fields := 'Condition: TExpression; Body: TStatement';
+  AstItem.Fields := 'Condition: TExpressionNode; Body: TStatementNode';
   StmtGrupo.Items.Add(AstItem);
   AstGrupos.Add(StmtGrupo);
 
