@@ -48,7 +48,7 @@ type
     function PeekToken(): TToken;
     procedure Synchronize();
     function ProcessStatement(): TStatementNode;
-    function ProcessBreakStatement(): TStatementNode;
+    function ProcessBreakStatements(): TStatementNode;
     function ProcessDoStatement(): TStatementNode;
     function ProcessContinueStatement(): TStatementNode;
     function ProcessReturnStatement(): TStatementNode;
@@ -479,7 +479,7 @@ begin
   if MatchToken(TTokenType.FOR_KEYWORD) then
     Result := ProcessForStatement()
   else if MatchToken(TTokenType.BREAK_KEYWORD) then
-    Result := ProcessBreakStatement()
+    Result := ProcessBreakStatements()
   else if MatchToken(TTokenType.CONTINUE_KEYWORD) then
     Result := ProcessContinueStatement()
   else if MatchToken(TTokenType.DO_KEYWORD) then
@@ -498,7 +498,7 @@ begin
     Result := ProcessExpressionStatements();
 end;
 
-function TParser.ProcessBreakStatement(): TStatementNode;
+function TParser.ProcessBreakStatements(): TStatementNode;
 begin
   if (FLoopDepth = 0) then
     Error(PreviousToken(), 'Cannot use "continue" outside of a loop.');
