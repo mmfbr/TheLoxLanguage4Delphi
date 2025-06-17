@@ -54,11 +54,14 @@ auto read_file(std::string_view path) -> std::string
 	return out;
 }
 
-int main()
+int realMain(int argc, char* argv[])
 {
 	SetConsoleOutputCP(65001);
 
-	std::string program = read_file("main.jpp");
+	std::string program_path = argv[1];
+
+	std::string program = read_file(program_path);
+	//std::string program = read_file("main.jpp");
 
 	EnvStack p_env;
 	FunctionMemory function_memory;
@@ -74,7 +77,7 @@ int main()
 		print_errors(error_reports);
 		return 64;
 	}
-	
+
 	if (showtree)
 	{
 		for (auto& stmt : statements)
@@ -84,8 +87,8 @@ int main()
 			break;
 		}
 	}
-	
-	
+
+
 	EnvStack sem_env;
 	Semantic semantic = Semantic(std::move(sem_env), function_memory);
 	std::vector<std::string> semantic_errors = semantic.Analyse(statements);
@@ -106,12 +109,33 @@ int main()
 		}
 		interpreter.Interpret(std::move(stmt));
 		if (not interpreter.GetRuntimeErrors().empty())
-		{	
+		{
 			std::cout << "Runtime Errors" << std::endl;
 			print_errors(interpreter.GetRuntimeErrors());
 			break;
 		}
 	}
-	
+
 	return 0;
 }
+
+
+int main(int argc, char* argv[])
+{
+	if (argc < 2)
+	{
+		std::cout << "Usage: jpp <file.jpp> [--showtree]" << std::endl;
+		return 64;
+	}
+	if (argc == 3 && std::string(argv[2]) == "--showtree")
+	{
+		showtree = true;
+	}
+	int result = realMain(argc, argv);
+	if (result != 0)
+	{
+		return result;
+	}
+	return 0;
+}
+
