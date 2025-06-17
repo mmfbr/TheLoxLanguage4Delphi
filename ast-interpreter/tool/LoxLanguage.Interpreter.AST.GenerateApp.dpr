@@ -20,6 +20,7 @@ var
   StmtGrupo: TAstGrupo;
   AstGrupos: TObjectList<TAstGrupo>;
 begin
+
   if (ParamCount <> 1) then
   begin
     Writeln('uso: ' + TPath.GetFileNameWithoutExtension(ParamStr(0)) + ' <diretório de saída>');

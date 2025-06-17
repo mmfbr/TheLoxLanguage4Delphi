@@ -1,0 +1,77 @@
+#expression for +, -
+#parsing * and /
+#unary operator
+#print statement
+#adding ==, !=, &&, ||
+#source file
+#strings
+#print with strings
+#variables (= operator)
+#operatore ++, --, +=, -=, *=, /=
+#opeatore +++ (incremento di 2)
+#NumberNode.value should be std::variant or std::any (worse)
+#binding statico
+#lexer: adding new data types (double, short, long, char)
+#fixing bugs
+#implicit casting numbers
+#functions
+#if statement
+
+writing tests
+
+group statements
+bang token (not)
+
+panic mode for error handling
+
+else if statement
+else statement
+
+array datatype
+char datatype
+string datatype
+
+while statement
+for statement
+return statement
+
+=================
+NOT DONE
+
+adding line + column for the error
+adding number/0 expection?
+
+
+==================
+BUGS
+
+
+
+==================
+FIXED BUG
+
+input:
+int s = -1;
+print s;
+output: No Output
+expected: -1
+
+input:
+whatever string
+output: bad token at the end (lexer)
+expected: end of file token (lexer)
+
+input: "3+2-1";
+output: "false";
+expected: "4"
+
+input: ais // identifier
+output: Semicolon missing, expected End Of File Token (wtf)
+expected: "Semicolon missing" | "Identifier 'ais' not found"
+
+input:
+double a = 3.4;
+double l = 0.2;
+print a + l;
+output: Semantic Analysis Error (data bind unmatched)
+expected: 3.6 (print)

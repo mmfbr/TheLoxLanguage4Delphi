@@ -1,0 +1,44 @@
+
+program => statement* EOF
+
+statement => ifStatement					|
+			 printStatement					|
+			 declearationStatement			|	 
+			 varAssignmentStatement			|
+			 functionDeclarationStatement	|
+			 functionCall					|
+			 blockStatement
+
+declearationStatement => varDeclearationStatement    | 
+						 functionDeclarationStatement
+
+ifStatement => "if" "(" expression ")" blockStatement
+				("else if" "(" expression ")" blockStatement)*
+				("else" blockStatement)?
+
+printStatement => "print " expression ";"
+varDeclearationStatement => varType IDENTIFIER ("=" expression)? ";"
+varAssignmentStatement => IDENTIFIER "=" expression ";"
+
+functionDeclarationStatement => varType IDENTIFIER "(" (parameters)? ")" blockStatement
+functionCall => IDENTIFIER "(" (arguments)? ")" ";"
+blockStatement => "{" statement* "}"
+
+parameters => varType IDENTIFIER ("," varType IDENTIFIER)*
+arguments => primary ("," primary)*
+
+varType => "short"  |
+		   "int"	|
+		   "long"	|
+		   "float"	|
+		   "double"
+
+expression => binary | unary | literal | group
+
+binary  => expression operator expression
+unary   => "-" unary | primary
+primary => NUMBER | STRING | IDENTIFIER | "true" | "false"
+group   => "(" expression ")"
+
+operator => "+" | "-" | "*" | "/" | "==" | "!=" | "&&" | "||" 
+

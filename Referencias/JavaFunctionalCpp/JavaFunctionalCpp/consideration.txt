@@ -1,0 +1,3 @@
+Implicit Conversion => It works the same as CPP
+
+Function Variable => Treated the same as a normal variable, whose value is a FunctionBodyExpression
